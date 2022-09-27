@@ -1,0 +1,46 @@
+{
+    "logger": {
+        "level": "debug",
+        "encoding": "json",
+        "outputPaths": [
+            "stdout",
+            "./logs/main.log"
+        ],
+        "errorOutputPaths": [
+            "stderr",
+            "./logs/error.log"
+        ],
+        "encoderConfig": {
+            "messageKey": "message",
+            "levelKey": "level",
+            "levelEncoder": "lowercase",
+            "nameKey": "channel",
+            "timeKey": "time",
+            "timeEncoder": "iso8601"
+        }
+    },
+    "server": {
+        "baseUrl": "http://localhost",
+        "port": 8080,
+        "api": {
+            "apiUrl": "/api",
+            "topPageSize": 100
+        },
+        "auth": {
+            "authUrl": "/auth",
+            "guard": {
+                "header": "X-Auth-Token",
+                "secret": "Long-long secret phrase for JWT token checksum!",
+                "tokenLifeHours": 24
+            }
+        }
+    },
+    "db": {
+        "username": "q12dbuser",
+        "password": "q12dbuserpassword",
+        "database": "q12db_local",
+        "hostname": "localhost",
+        "port": 5432,
+        "ssl_mode": false
+    }
+}
