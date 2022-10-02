@@ -2,13 +2,14 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/gGerret/otus-social-prj/router"
 	"go.uber.org/zap"
 	"io/ioutil"
 )
 
 type Config struct {
-	Logger *zap.Config `json:"logger"`
-	//Server *routers.ServerConfig `json:"server"`
+	Logger *zap.Config          `json:"logger"`
+	Server *router.ServerConfig `json:"server"`
 	//Db     *repository.ConfigDb  `json:"db"`
 }
 

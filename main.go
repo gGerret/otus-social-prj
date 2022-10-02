@@ -3,13 +3,26 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/gGerret/otus-social-prj/router"
 	"go.uber.org/zap"
 	"os"
 )
 
+/*
+ * metrics library "github.com/hashicorp/go-metrics"
+ * OpenAPI swagger lib "github.com/swaggo/gin-swagger"
+
+ *
+ *
+ *
+ *
+ */
+
 const (
 	PathConfigDefault = "./config.json"
+	AppName           = "Gerret's Social Project (Otus HLA)"
 	AppVersion        = "1.0.0"
+	Copyright         = "© 2022 #gGerret"
 )
 
 type Arguments struct {
@@ -35,6 +48,18 @@ func main() {
 		}
 	}()
 	mainLogger.Info("Application started")
+
+	socialWeb, err := router.NewSocialServer(cfg.Server, mainLogger)
+	if err != nil {
+		mainLogger.DPanicf("Failed to initialize server with error: %s", err.Error())
+	}
+
+	err = socialWeb.RunServer()
+	if err != nil {
+		mainLogger.DPanicf("Server error occured: %s", err.Error())
+	}
+
+	mainLogger.Info("Application shutdown")
 }
 
 func initArguments() *Arguments {
@@ -71,6 +96,6 @@ func initLogger(cfg *Config) *zap.SugaredLogger {
 }
 
 func printVersion() {
-	fmt.Println(fmt.Sprintf("Gerret's Social Project (Otus HLA) v%s", AppVersion))
-	fmt.Println("© 2022 #gGerret")
+	fmt.Println(fmt.Sprintf("%s v%s", AppName, AppVersion))
+	fmt.Println(Copyright)
 }

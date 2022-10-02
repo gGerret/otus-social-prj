@@ -36,11 +36,12 @@
         }
     },
     "db": {
-        "username": "q12dbuser",
-        "password": "q12dbuserpassword",
-        "database": "q12db_local",
+        "username": "social_svc",
+        "password": "social_sql_passw0rd",
+        "database": "social",
         "hostname": "localhost",
-        "port": 5432,
+        "port": 13306,
+        "net": "tcp",
         "ssl_mode": false
     }
 }
