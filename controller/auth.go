@@ -12,7 +12,6 @@ import (
 	"go.uber.org/zap"
 	"net/http"
 	"net/http/httputil"
-	"uyg-backend/models"
 )
 
 const (
@@ -141,8 +140,8 @@ func (c *AuthController) PostToken(ctx *gin.Context, errHelper *ErrorHelper) {
 		c.logger.Error(err)
 	}
 	if userModel == nil {
-		userModel = model.UserFromSocialUser(user)
-		err = rep.CreateByModel(userModel)
+		userModel = user
+		err = rep.CreateUserByModel(userModel)
 		publicId = userModel.PublicId
 		isNew = true
 		if err != nil {
@@ -180,7 +179,7 @@ func (c *AuthController) PostUserPass(ctx *gin.Context) {
 func (c *AuthController) PostUserPassMock(ctx *gin.Context) {
 	errHelper := NewErrHelper(ctx, c.Name, "PostUserPassMock", c.logger)
 
-	userModel := &models.UserModel{}
+	userModel := &model.UserModel{}
 	publicId := uuid.Must(uuid.NewV4())
 
 	userModel.PublicId = publicId.String()

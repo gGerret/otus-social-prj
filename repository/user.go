@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"github.com/gGerret/otus-social-prj/repository/model"
+	"github.com/gofrs/uuid"
 	"math/rand"
 	"time"
 )
@@ -30,7 +31,7 @@ func GetUserRepositoryDB(db *sql.DB) *UserRepository {
 
 func (r *UserRepository) GetById(userId string) (*model.UserModel, error) {
 	//Пока возвращаем мок
-	return CreateUserModelMoc(userId), nil
+	return CreateUserModelMoc(), nil
 }
 
 func (r *UserRepository) GetByPublicId(publicId string) (*model.UserModel, error) {
@@ -38,10 +39,22 @@ func (r *UserRepository) GetByPublicId(publicId string) (*model.UserModel, error
 	return CreateUserModelMoc(), nil
 }
 
+func (r *UserRepository) GetByPublicIdUid(uuid uuid.UUID) (*model.UserModel, error) {
+	return r.GetByPublicId(uuid.String())
+}
+
+func (r *UserRepository) UpdateUser(userModel *model.UserModel) error {
+	return nil
+}
+
+func (r *UserRepository) CreateUserByModel(userModel *model.UserModel) error {
+	return nil
+}
+
 func CreateUserModelMoc() *model.UserModel {
 	return &model.UserModel{
 		Id:         rand.Int63n(2000000),
-		PublicId:   userId,
+		PublicId:   "userId",
 		FirstName:  "Валерий",
 		LastName:   "Сидоров",
 		MiddleName: "Владимирович",

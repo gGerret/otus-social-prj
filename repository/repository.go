@@ -3,7 +3,7 @@ package repository
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 const (

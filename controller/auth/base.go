@@ -15,14 +15,14 @@ func NewBaseAuthenticator(logger *zap.SugaredLogger) Authenticator {
 	return &a
 }
 func (b *BaseAuthenticator) GetName() string {
-
+	return "base-authenticator"
 }
 func (b *BaseAuthenticator) GetSystemId() uint {
-
+	return 1
 }
 func (b *BaseAuthenticator) Do(code string, redirectUri string) (*entity.UserEntity, error) {
-
+	return entity.CreateUserEntityMoc(), nil
 }
 func (b *BaseAuthenticator) GetAuthURL(string) string {
-
+	return ""
 }

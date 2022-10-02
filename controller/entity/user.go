@@ -2,11 +2,12 @@ package entity
 
 import (
 	"github.com/gGerret/otus-social-prj/repository/model"
+	"github.com/gofrs/uuid"
 	"time"
 )
 
 type iUserEntity interface {
-	LoadFomModel(userModel model.UserModel)
+	LoadFomModel(userModel *model.UserModel)
 }
 
 type UserPost struct {
@@ -54,7 +55,7 @@ type UserPasswordUpdateEntity struct {
 	RetypePassword string `json:"retype_pass"`
 }
 
-func (u *UserEntity) LoadFromModel(userModel model.UserModel) {
+func (u *UserEntity) LoadFromModel(userModel *model.UserModel) {
 	u.UserId = userModel.PublicId
 	u.FirstName = userModel.FirstName
 	u.LastName = userModel.LastName
@@ -66,7 +67,7 @@ func (u *UserEntity) LoadFromModel(userModel model.UserModel) {
 	u.UpdatedAt = userModel.UpdatedAt
 }
 
-func (u *UserPublicEntity) LoadFromModel(userModel model.UserModel) {
+func (u *UserPublicEntity) LoadFromModel(userModel *model.UserModel) {
 	u.UserId = userModel.PublicId
 	u.FirstName = userModel.FirstName
 	u.LastName = userModel.LastName
@@ -76,7 +77,7 @@ func (u *UserPublicEntity) LoadFromModel(userModel model.UserModel) {
 	u.Interests = userModel.Interests
 }
 
-func (u *UserUpdateEntity) LoadFromModel(userModel model.UserModel) {
+func (u *UserUpdateEntity) LoadFromModel(userModel *model.UserModel) {
 	u.FirstName = userModel.FirstName
 	u.LastName = userModel.LastName
 	u.MiddleName = userModel.MiddleName
@@ -93,5 +94,19 @@ func (u *UserUpdateEntity) ToModel() *model.UserModel {
 		Town:       u.Town,
 		GenderDesc: u.Gender,
 		Interests:  u.Interests,
+	}
+}
+
+func CreateUserEntityMoc() *UserEntity {
+	return &UserEntity{
+		UserId:     uuid.Must(uuid.NewV4()).String(),
+		FirstName:  "Михаил",
+		LastName:   "Ушаков",
+		MiddleName: "Николаевич",
+		Town:       "Рязань",
+		Gender:     "мужской",
+		Interests:  []string{"Автомобили", "Рисование", "Программирование"},
+		CreatedAt:  time.Now().AddDate(0, -1, 0),
+		UpdatedAt:  time.Now().AddDate(0, 0, -11),
 	}
 }
