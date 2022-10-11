@@ -5,6 +5,7 @@ import "time"
 type UserModel struct {
 	Id           int64
 	PublicId     string
+	Email        string
 	PasswordHash string
 	FirstName    string
 	LastName     string

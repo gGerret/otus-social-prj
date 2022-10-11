@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/gGerret/otus-social-prj/router"
-	"go.uber.org/zap"
+	"github.com/gGerret/otus-social-prj/social"
 	"os"
 )
 
@@ -39,7 +39,7 @@ func main() {
 	}
 
 	cfg := initConfig(args.Config)
-	logger := initLogger(cfg)
+	logger := social.InitLogger(cfg.Logger)
 	mainLogger := logger.Named("main")
 	defer func() {
 		err := logger.Sync()
@@ -84,15 +84,6 @@ func initConfig(cfgPath string) *Config {
 	}
 
 	return cfg
-}
-
-func initLogger(cfg *Config) *zap.SugaredLogger {
-	logger, err := cfg.Logger.Build()
-	if err != nil {
-		panic(fmt.Sprintf("Logger config is corrupted. Error: %s", err.Error()))
-	}
-
-	return logger.Sugar()
 }
 
 func printVersion() {

@@ -5,8 +5,8 @@ import (
 	"time"
 )
 
-type iUserEntity interface {
-	LoadFomModel(userModel model.UserModel)
+type IUserEntity interface {
+	FomModel(userModel *model.UserModel)
 }
 
 type UserPost struct {
@@ -29,6 +29,7 @@ type UserPublicEntity struct {
 
 type UserEntity struct {
 	UserId     string    `json:"user_id"`
+	Email      string    `json:"email"`
 	FirstName  string    `json:"first_name"`
 	LastName   string    `json:"last_name"`
 	MiddleName string    `json:"middle_name"`
@@ -54,8 +55,9 @@ type UserPasswordUpdateEntity struct {
 	RetypePassword string `json:"retype_pass"`
 }
 
-func (u *UserEntity) LoadFromModel(userModel model.UserModel) {
+func (u *UserEntity) FromModel(userModel *model.UserModel) {
 	u.UserId = userModel.PublicId
+	u.Email = userModel.Email
 	u.FirstName = userModel.FirstName
 	u.LastName = userModel.LastName
 	u.MiddleName = userModel.MiddleName
@@ -66,7 +68,20 @@ func (u *UserEntity) LoadFromModel(userModel model.UserModel) {
 	u.UpdatedAt = userModel.UpdatedAt
 }
 
-func (u *UserPublicEntity) LoadFromModel(userModel model.UserModel) {
+func (u *UserEntity) ToModel() *model.UserModel {
+	return &model.UserModel{
+		PublicId:   u.UserId,
+		Email:      u.Email,
+		FirstName:  u.FirstName,
+		LastName:   u.LastName,
+		MiddleName: u.MiddleName,
+		Town:       u.Town,
+		GenderDesc: u.Gender,
+		Interests:  u.Interests,
+	}
+}
+
+func (u *UserPublicEntity) FromModel(userModel *model.UserModel) {
 	u.UserId = userModel.PublicId
 	u.FirstName = userModel.FirstName
 	u.LastName = userModel.LastName
@@ -76,7 +91,7 @@ func (u *UserPublicEntity) LoadFromModel(userModel model.UserModel) {
 	u.Interests = userModel.Interests
 }
 
-func (u *UserUpdateEntity) LoadFromModel(userModel model.UserModel) {
+func (u *UserUpdateEntity) FromModel(userModel *model.UserModel) {
 	u.FirstName = userModel.FirstName
 	u.LastName = userModel.LastName
 	u.MiddleName = userModel.MiddleName

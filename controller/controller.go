@@ -1,45 +1,30 @@
 package controller
 
 import (
-	"errors"
-	"github.com/gGerret/otus-social-prj/controller/auth"
-	"github.com/gGerret/otus-social-prj/repository/model"
+	"github.com/gGerret/otus-social-prj/social"
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
+	"github.com/gofrs/uuid"
 )
 
 type Controller struct {
 	Name string
 }
 
+//Базовый фильтр для всех запросов. Идёт первым.
+//    * Добвляет случайный идентификатор запроса в контекст запроса для отслеживания
+func BaseFilter(ctx *gin.Context) {
+	reqId := uuid.Must(uuid.NewV4())
+	ctx.Set("reqId", reqId.String())
+	ctx.Next()
+}
+
 type ApiController struct {
 	Controller
 	cfg    *ConfigApi
-	logger *zap.SugaredLogger
+	logger *social.SocialLogger
 }
 
-func (c *ApiController) Init(config *ConfigApi, logger *zap.SugaredLogger) {
+func (c *ApiController) Init(config *ConfigApi, logger *social.SocialLogger) {
 	c.logger = logger
 	c.cfg = config
-}
-
-func (c *AuthController) Init(config *auth.ConfigAuth, logger *zap.SugaredLogger) {
-	c.logger = logger
-	c.cfg = config
-}
-
-func (c *ApiController) GetUserFromContext(ctx *gin.Context) (*model.UserModel, error) {
-	u, exists := ctx.Get("User")
-
-	if !exists || u == nil {
-		return nil, errors.New("there is no user information in context")
-	}
-
-	switch u.(type) {
-	case *model.UserModel:
-		return u.(*model.UserModel), nil
-	default:
-		return nil, errors.New("unknown type in context instead of UserModel")
-	}
-
 }
