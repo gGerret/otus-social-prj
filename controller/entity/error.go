@@ -29,8 +29,9 @@ var (
 	DataErrUserExists     = ErrorEntity{http.StatusBadRequest, 40003, "User already exists", "User with same email already registered"}
 
 	//Database errors
-	UpdateUserErr = ErrorEntity{http.StatusInternalServerError, 50001, "DB error occurred", "An error occurred while trying to update user info"}
-	GetCountryErr = ErrorEntity{http.StatusInternalServerError, 50002, "DB error occurred", "An error occurred while trying to read country list"}
+	RegisterUserErr = ErrorEntity{http.StatusInternalServerError, 50001, "User register error", "User with this email already exists"}
+	UpdateUserErr   = ErrorEntity{http.StatusInternalServerError, 50002, "DB error occurred", "An error occurred while trying to update user info"}
+	GetCountryErr   = ErrorEntity{http.StatusInternalServerError, 50003, "DB error occurred", "An error occurred while trying to read country list"}
 )
 
 type ErrorEntity struct {

@@ -4,10 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gGerret/otus-social-prj/controller/entity"
+	"github.com/gGerret/otus-social-prj/controller/validator"
 	"github.com/gGerret/otus-social-prj/repository"
 	"github.com/gGerret/otus-social-prj/repository/model"
 	"github.com/gGerret/otus-social-prj/social"
 	"github.com/gin-gonic/gin"
+	"github.com/gofrs/uuid"
 	"net/http"
 	"time"
 )
@@ -37,6 +39,39 @@ func (c *UserController) GetUserFromContext(ctx *gin.Context) (*model.UserModel,
 		return nil, errors.New("unknown type in context instead of UserModel")
 	}
 
+}
+
+func (c *UserController) RegisterUser(ctx *gin.Context) {
+	localLogger := c.logger.ContextLogger(ctx.GetString("reqId"), "RegisterUser")
+	ec := NewErrHelper(ctx, localLogger)
+
+	var newUser entity.UserRegisterEntity
+	err := ctx.BindJSON(&newUser)
+	if err != nil {
+		ec.SetErr(entity.ErrBadRequest, err)
+	} else {
+		v := validator.UserRegisterValidator{Entity: &newUser}
+		fe := v.Validate()
+		if len(fe) != 0 {
+			ec.SetErrEx(entity.DataErrBadUserInfo, fe)
+			return
+		}
+	}
+
+	rep := repository.GetUserRepository()
+	userModel := newUser.ToModel()
+	userModel.PublicId = uuid.Must(uuid.NewV4()).String()
+	userModel.CreatedAt = time.Now()
+
+	err = rep.CreateByModel(userModel)
+	if err != nil {
+		ec.SetErr(entity.RegisterUserErr, err)
+		return
+	} else {
+		localLogger.Infof("User %s successfully registered", userModel.PublicId)
+		localLogger.Debug(userModel)
+		ctx.Status(http.StatusOK)
+	}
 }
 
 func (c *UserController) GetCurrentUser(ctx *gin.Context) {
@@ -90,7 +125,7 @@ func (c *UserController) PutUser(ctx *gin.Context) {
 
 		var userModel = userInfo.ToModel()
 		userModel.Id = curUser.Id
-		localLogger.Debug(fmt.Sprintf("userModel.ID = %d, currentUder.ID = %d", userModel.Id, curUser.Id))
+		localLogger.Debug(fmt.Sprintf("userModel.Id = %d, currentUder.Id = %d", userModel.Id, curUser.Id))
 		err = rep.UpdateUser(userModel)
 		if err != nil {
 			ec.SetErr(entity.UpdateUserErr, err)
@@ -102,20 +137,14 @@ func (c *UserController) PutUser(ctx *gin.Context) {
 
 }
 
-func (c *UserController) GetUserMoc(ctx *gin.Context) {
-	id := ctx.Param("id")
-	if id == "" {
-		id = "currentUser"
-	}
-	ctx.JSON(http.StatusOK, entity.UserEntity{
-		UserId:     id,
-		FirstName:  "Михаил",
-		LastName:   "Ушаков",
-		MiddleName: "Николаевич",
-		Town:       "Рязань",
-		Gender:     "мужской",
-		Interests:  []string{"Автомобили", "Рисование", "Программирование"},
-		CreatedAt:  time.Now().AddDate(0, -1, 0),
-		UpdatedAt:  time.Now().AddDate(0, 0, -11),
-	})
+func (c *UserController) GetUserByFilter(context *gin.Context) {
+
+}
+
+func (c *UserController) GetUserFriends(context *gin.Context) {
+
+}
+
+func (c *UserController) MakeFriendship(context *gin.Context) {
+
 }

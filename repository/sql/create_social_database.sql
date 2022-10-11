@@ -7,7 +7,7 @@ create table if not exists social.user
     id bigint primary key auto_increment comment 'внутренний сквозной идентификатор',
     public_id varchar(64) unique not null comment 'публичный уникальный идентификатор',
     pass_hash varchar(255) comment 'хеш пароля пользователя',
-    email varchar(255) comment 'email польщователя',
+    email varchar(255) unique not null comment 'email польщователя',
     first_name varchar(32) not null comment 'имя',
     last_name varchar(32) comment 'фамилия',
     middle_name varchar(2) comment 'отчество',

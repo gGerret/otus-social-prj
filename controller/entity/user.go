@@ -40,6 +40,17 @@ type UserEntity struct {
 	UpdatedAt  time.Time `json:"updated"`
 }
 
+type UserRegisterEntity struct {
+	Email      string   `json:"email"`
+	Password   string   `json:"passwd"`
+	FirstName  string   `json:"first_name"`
+	LastName   string   `json:"last_name"`
+	MiddleName string   `json:"middle_name"`
+	Gender     string   `json:"gender"`
+	Interests  []string `json:"interests"`
+	Town       string   `json:"town"`
+}
+
 type UserUpdateEntity struct {
 	FirstName  string   `json:"first_name"`
 	LastName   string   `json:"last_name"`
@@ -102,6 +113,17 @@ func (u *UserUpdateEntity) FromModel(userModel *model.UserModel) {
 
 func (u *UserUpdateEntity) ToModel() *model.UserModel {
 	return &model.UserModel{
+		FirstName:  u.FirstName,
+		LastName:   u.LastName,
+		MiddleName: u.MiddleName,
+		Town:       u.Town,
+		GenderDesc: u.Gender,
+		Interests:  u.Interests,
+	}
+}
+func (u *UserRegisterEntity) ToModel() *model.UserModel {
+	return &model.UserModel{
+		Email:      u.Email,
 		FirstName:  u.FirstName,
 		LastName:   u.LastName,
 		MiddleName: u.MiddleName,

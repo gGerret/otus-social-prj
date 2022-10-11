@@ -37,13 +37,9 @@ func NewSocialServer(config *ServerConfig, logger *social.SocialLogger) (*Social
 	q.guard = jwt.NewGuard(
 		q.cfg.Auth.Guard,
 		logger.Named("guard"),
-		q.cfg.Api.ApiURL+q.cfg.Auth.AuthUrl+"/user/uri",
-		q.cfg.Api.ApiURL+q.cfg.Auth.AuthUrl+"/uri",
-		q.cfg.Api.ApiURL+q.cfg.Auth.AuthUrl+"/token",
+		q.cfg.Api.ApiURL+"/register",
 		q.cfg.Api.ApiURL+q.cfg.Auth.AuthUrl+"/login",
-		q.cfg.Api.ApiURL+q.cfg.Auth.AuthUrl+"/user/token",
-		q.cfg.Api.ApiURL+q.cfg.Auth.AuthUrl+"/user/login",
-		q.cfg.Api.ApiURL+q.cfg.Auth.AuthUrl+"/test_init",
+		q.cfg.Api.ApiURL+q.cfg.Auth.AuthUrl+"/test_init", //TODO: Надо будет убрать для прода
 	)
 
 	q.router.Use(controller.BaseFilter)
@@ -68,12 +64,17 @@ func NewSocialServer(config *ServerConfig, logger *social.SocialLogger) (*Social
 	{
 		authRoute := apiRoute.Group(q.cfg.Auth.AuthUrl)
 		{
+
 			authRoute.POST("/login", q.authCtrl.PostUserPassMock)
 			authRoute.GET("/test_init", q.testCtrl.InitTestDB)
 		}
+		apiRoute.POST("/register", q.userCtrl.RegisterUser)
 		apiRoute.GET("/user", q.userCtrl.GetCurrentUser)
 		apiRoute.GET("/user/:id", q.userCtrl.GetUserById)
 		apiRoute.PUT("/user", q.userCtrl.PutUser)
+		apiRoute.POST("user/query", q.userCtrl.GetUserByFilter)
+		apiRoute.GET("/user/friend", q.userCtrl.GetUserFriends)
+		apiRoute.POST("/user/friend/:id", q.userCtrl.MakeFriendship)
 	}
 
 	return q, nil
