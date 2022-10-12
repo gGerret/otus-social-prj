@@ -8,6 +8,7 @@ import (
 	"github.com/gGerret/otus-social-prj/repository"
 	"github.com/gGerret/otus-social-prj/repository/model"
 	"github.com/gGerret/otus-social-prj/social"
+	"github.com/gGerret/otus-social-prj/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/gofrs/uuid"
 	"net/http"
@@ -60,6 +61,7 @@ func (c *UserController) RegisterUser(ctx *gin.Context) {
 
 	rep := repository.GetUserRepository()
 	userModel := newUser.ToModel()
+	userModel.PasswordHash = utils.GeneratePassHash(newUser.Password)
 	userModel.PublicId = uuid.Must(uuid.NewV4()).String()
 	userModel.CreatedAt = time.Now()
 

@@ -10,7 +10,7 @@ create table if not exists social.user
     email varchar(255) unique not null comment 'email польщователя',
     first_name varchar(32) not null comment 'имя',
     last_name varchar(32) comment 'фамилия',
-    middle_name varchar(2) comment 'отчество',
+    middle_name varchar(32) comment 'отчество',
     gender int not null comment 'id пола из таблицы social.gender',
     town varchar(50) comment 'город',
     created_at timestamp not null comment 'время создания записи',
@@ -37,7 +37,7 @@ create table if not exists social.interests
     id bigint primary key auto_increment comment 'внутренний сквозной идентификатор',
     interest varchar(255) not null unique comment 'Интерес - строка с текстом, уникальная в рамках системы',
     created_at timestamp not null comment 'время создания'
-) comment 'Таблица интересов';
+) comment 'Таблица уникальных интересов';
 
 create table if not exists social.user_interests_link
 (

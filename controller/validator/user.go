@@ -10,7 +10,8 @@ var (
 	FirstNameFieldErr  = FieldError{"first_name", "First name is incorrect"}
 	LastNameFieldErr   = FieldError{"last_name", "First name is incorrect"}
 	MiddleNameFieldErr = FieldError{"middle_name", "First name is incorrect"}
-	PasswordFieldErr   = FieldError{"passwd", "Password must contains from 6 to 20 symbols. At leas one digit, one lowercase latin letter and one uppercase latin letter"}
+	PasswdFieldErr     = FieldError{"passwd", "Password must contains from 6 to 20 symbols. At leas one digit, one lowercase latin letter and one uppercase latin letter"}
+	PasswdNotMatch     = FieldError{"passwd", "Password and retype does not match"}
 )
 
 type UserRegisterValidator struct {
@@ -34,8 +35,12 @@ func (v *UserRegisterValidator) Validate() []*FieldError {
 		fieldErrs = append(fieldErrs, &MiddleNameFieldErr)
 	}
 	if !isValidPassword(v.Entity.Password) {
-		fieldErrs = append(fieldErrs, &PasswordFieldErr)
+		fieldErrs = append(fieldErrs, &PasswdFieldErr)
 	}
+	if !isPasswordMatchRetype(v.Entity.Password, v.Entity.RetypePassword) {
+		fieldErrs = append(fieldErrs, &PasswdNotMatch)
+	}
+
 	return fieldErrs
 }
 
@@ -46,6 +51,9 @@ func isValidEmail(email string) bool {
 func isValidPassword(password string) bool {
 	var validPassword = regexp.MustCompile(`(?=\d*)(?=[a-z]*)(?=[A-Z]*).{6,20}`)
 	return validPassword.MatchString(password)
+}
+func isPasswordMatchRetype(password string, retype string) bool {
+	return password == retype
 }
 func isValidName(someName string) bool {
 	var validName = regexp.MustCompile(`^[a-zA-Zа-яА-Я]$`)

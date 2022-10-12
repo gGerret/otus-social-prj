@@ -41,14 +41,15 @@ type UserEntity struct {
 }
 
 type UserRegisterEntity struct {
-	Email      string   `json:"email"`
-	Password   string   `json:"passwd"`
-	FirstName  string   `json:"first_name"`
-	LastName   string   `json:"last_name"`
-	MiddleName string   `json:"middle_name"`
-	Gender     string   `json:"gender"`
-	Interests  []string `json:"interests"`
-	Town       string   `json:"town"`
+	Email          string   `json:"email"`
+	Password       string   `json:"passwd"`
+	RetypePassword string   `json:"retype_passwd"`
+	FirstName      string   `json:"first_name"`
+	LastName       string   `json:"last_name"`
+	MiddleName     string   `json:"middle_name"`
+	Gender         string   `json:"gender"`
+	Interests      []string `json:"interests"`
+	Town           string   `json:"town"`
 }
 
 type UserUpdateEntity struct {

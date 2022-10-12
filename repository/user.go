@@ -44,6 +44,33 @@ func (r *UserRepository) UpdateUser(userModel *model.UserModel) error {
 }
 
 func (r *UserRepository) CreateByModel(userModel *model.UserModel) error {
+
+	usrRawModel := model.GetRawUserModel(userModel)
+	interestRepo := GetInterestRepositoryDB(r.db)
+
+	userInterests := userModel.Interests
+
+	knownInterests, err := interestRepo.GetKnownInterestsFromList(userModel.Interests)
+	for _,interest := userModel.Interests {
+
+	}
+
+	createUsrTx, err := r.db.Begin()
+	if err != nil {
+		return err
+	}
+
+	_, err = createUsrTx.Exec("insert into social.user (public_id, pass_hash, email, first_name, last_name, middle_name, gender, town, created_at) " +
+		"values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		usrRawModel.PublicId, usrRawModel.PasswordHash, usrRawModel.Email, usrRawModel.FirstName,
+		usrRawModel.LastName, usrRawModel.FirstName, usrRawModel.MiddleName, usrRawModel.Gender,
+		usrRawModel.Town, usrRawModel.CreatedAt,
+	)
+	if err != nil {
+		return err
+	}
+
+
 	return nil
 }
 
