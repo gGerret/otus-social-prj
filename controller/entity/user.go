@@ -76,8 +76,8 @@ func (u *UserEntity) FromModel(userModel *model.UserModel) {
 	u.Town = userModel.Town
 	u.Gender = userModel.GenderDesc
 	u.Interests = userModel.Interests
-	u.CreatedAt = userModel.CreatedAt
-	u.UpdatedAt = userModel.UpdatedAt
+	u.CreatedAt = userModel.CreatedAt.Time
+	u.UpdatedAt = userModel.UpdatedAt.Time
 }
 
 func (u *UserEntity) ToModel() *model.UserModel {

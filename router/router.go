@@ -81,8 +81,8 @@ func NewSocialServer(config *ServerConfig, logger *social.SocialLogger) (*Social
 		apiRoute.GET("/user/:id", q.userCtrl.GetUserById)
 		apiRoute.PUT("/user", q.userCtrl.PutUser)
 		apiRoute.POST("user/query", q.userCtrl.GetUserByFilter)
-		apiRoute.GET("/user/friend", q.userCtrl.GetUserFriends)
-		apiRoute.POST("/user/friend/:id", q.userCtrl.MakeFriendship)
+		//apiRoute.GET("/user/friend", q.userCtrl.GetUserFriends)
+		//apiRoute.POST("/user/friend/:friend_id", q.userCtrl.MakeFriendship)
 
 		//Справочники
 		apiRoute.GET("/dict/interests", q.dictCtrl.GetKnownInterests)

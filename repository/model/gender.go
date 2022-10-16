@@ -7,6 +7,12 @@ type GenderDictRawModel struct {
 	FullDesc  string
 }
 
+type UserGenderModel struct {
+	Code      string
+	ShortDesc string
+	FullDesc  string
+}
+
 func (g *GenderDictRawModel) TableName() string {
 	return "gender"
 }

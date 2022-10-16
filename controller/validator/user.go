@@ -56,6 +56,9 @@ func isPasswordMatchRetype(password string, retype string) bool {
 	return password == retype
 }
 func isValidName(someName string) bool {
+	if len(someName) == 0 {
+		return true
+	}
 	var validName = regexp.MustCompile(`^[a-zA-Zа-яА-Я]$`)
 	return validName.MatchString(someName)
 }

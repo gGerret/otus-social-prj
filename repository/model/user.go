@@ -1,6 +1,8 @@
 package model
 
-import "time"
+import (
+	"database/sql"
+)
 
 type UserModel struct {
 	Id           int64
@@ -14,9 +16,9 @@ type UserModel struct {
 	GenderDesc   string
 	Interests    []string
 	Town         string
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
-	DeletedAt    time.Time
+	CreatedAt    sql.NullTime
+	UpdatedAt    sql.NullTime
+	DeletedAt    sql.NullTime
 }
 
 type UserRawModel struct {
@@ -29,9 +31,9 @@ type UserRawModel struct {
 	MiddleName   string
 	Gender       int
 	Town         string
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
-	DeletedAt    time.Time
+	CreatedAt    sql.NullTime
+	UpdatedAt    sql.NullTime
+	DeletedAt    sql.NullTime
 }
 
 func GetRawUserModel(um *UserModel) *UserRawModel {

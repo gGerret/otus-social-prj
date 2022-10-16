@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/gGerret/otus-social-prj/repository/model"
 	"github.com/gofrs/uuid"
 	"math/rand"
@@ -16,11 +17,10 @@ type UserRepository struct {
 }
 
 func GetUserRepository() *UserRepository {
-	//Пока без БД балуемся
-	/*if database == nil {
-	    panic("Error! Database connection is not initialized")
-	}*/
-	return GetUserRepositoryDB(nil)
+	if database == nil {
+		panic("Error! Database connection is not initialized")
+	}
+	return GetUserRepositoryDB(database)
 }
 
 func GetUserRepositoryDB(db *sql.DB) *UserRepository {
@@ -29,64 +29,139 @@ func GetUserRepositoryDB(db *sql.DB) *UserRepository {
 	return rep
 }
 
-func (r *UserRepository) GetById(userId string) (*model.UserModel, error) {
-	//Пока возвращаем мок
-	return CreateUserModelMoc(), nil
+func (r *UserRepository) GetById(userId int64) (*model.UserModel, error) {
+	row := r.db.QueryRow(
+		"select usr.id,\n"+
+			"       usr.public_id,\n"+
+			"       usr.pass_hash,\n"+
+			"       usr.email,\n"+
+			"       usr.first_name,\n"+
+			"       usr.last_name,\n"+
+			"       usr.middle_name,\n"+
+			"       usr.gender AS gender,\n"+
+			"       g.full_desc AS gender_desc,\n"+
+			"       usr.town,\n"+
+			"       usr.created_at,\n"+
+			"       usr.updated_at,\n"+
+			"       usr.deleted_at\n"+
+			"from social.user usr\n"+
+			"    join social.gender g ON g.id = usr.gender\n"+
+			"where usr.id = ?", userId)
+	userModel := model.UserModel{}
+	if err := row.Scan(&userModel.Id, &userModel.PublicId, &userModel.PasswordHash, &userModel.Email,
+		&userModel.FirstName, &userModel.LastName, &userModel.MiddleName, &userModel.Gender, &userModel.GenderDesc, &userModel.Town,
+		&userModel.CreatedAt, &userModel.UpdatedAt, &userModel.DeletedAt); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("UserRepository.GetById %d : no such user", userId)
+		}
+		return nil, fmt.Errorf("InterestRepository.GetById %d: %v", userId, err)
+	}
+	return &userModel, nil
 }
 
 func (r *UserRepository) GetByPublicId(publicId string) (*model.UserModel, error) {
-	//Пока возвращаем мок
-	return CreateUserModelMoc(), nil
+	row := r.db.QueryRow(
+		"select usr.id,\n"+
+			"       usr.public_id,\n"+
+			"       usr.pass_hash,\n"+
+			"       usr.email,\n"+
+			"       usr.first_name,\n"+
+			"       usr.last_name,\n"+
+			"       usr.middle_name,\n"+
+			"       usr.gender AS gender,\n"+
+			"       g.full_desc AS gender_desc,\n"+
+			"       usr.town,\n"+
+			"       usr.created_at,\n"+
+			"       usr.updated_at,\n"+
+			"       usr.deleted_at\n"+
+			"from social.user usr\n"+
+			"    join social.gender g ON g.id = usr.gender\n"+
+			"where usr.public_id = ?", &publicId)
+	userModel := model.UserModel{}
+	if err := row.Scan(&userModel.Id, &userModel.PublicId, &userModel.PasswordHash, &userModel.Email,
+		&userModel.FirstName, &userModel.LastName, &userModel.MiddleName, &userModel.Gender, &userModel.GenderDesc, &userModel.Town,
+		&userModel.CreatedAt, &userModel.UpdatedAt, &userModel.DeletedAt); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("UserRepository.GetByPublicId %s : no such user", publicId)
+		}
+		return nil, fmt.Errorf("InterestRepository.GetByPublicId %s: %v", publicId, err)
+	}
+	return &userModel, nil
 }
 
 func (r *UserRepository) UpdateUser(userModel *model.UserModel) error {
-	return nil
+	return fmt.Errorf("UserRepository.UpdateUser %d, %s: method is not implemented yet", userModel.Id, userModel.PublicId)
 }
 
-func (r *UserRepository) CreateByModel(userModel *model.UserModel) error {
+//TODO: Добавить транзакцию для атомарного добавления пользователя
+func (r *UserRepository) CreateByModel(userModel *model.UserModel) (createdUser *model.UserModel, err error) {
 
 	usrRawModel := model.GetRawUserModel(userModel)
 	interestRepo := GetInterestRepositoryDB(r.db)
 
-	userInterests := userModel.Interests
-
-	knownInterests, err := interestRepo.GetKnownInterestsFromList(userModel.Interests)
-	for _,interest := userModel.Interests {
-
-	}
-
-	createUsrTx, err := r.db.Begin()
+	knownInterests, unknownInterests, err := interestRepo.GetInterestsFromList(userModel.Interests)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	_, err = createUsrTx.Exec("insert into social.user (public_id, pass_hash, email, first_name, last_name, middle_name, gender, town, created_at) " +
+	if len(unknownInterests) > 0 {
+		newInterests, err := interestRepo.InsertInterestsSkipExisting(unknownInterests)
+		if err != nil {
+			return nil, err
+		}
+		knownInterests = append(knownInterests, newInterests...)
+	}
+
+	result, err := r.db.Exec("insert into social.user (public_id, pass_hash, email, first_name, last_name, middle_name, gender, town, created_at) "+
 		"values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
 		usrRawModel.PublicId, usrRawModel.PasswordHash, usrRawModel.Email, usrRawModel.FirstName,
-		usrRawModel.LastName, usrRawModel.FirstName, usrRawModel.MiddleName, usrRawModel.Gender,
-		usrRawModel.Town, usrRawModel.CreatedAt,
+		usrRawModel.LastName, usrRawModel.MiddleName, usrRawModel.Gender, usrRawModel.Town, usrRawModel.CreatedAt,
 	)
+	if err != nil {
+		return nil, err
+	}
+	newUser := *userModel
+	newUser.Id, err = result.LastInsertId()
+	if err != nil {
+		return nil, err
+	}
+	createdUser = &newUser
+	if knownInterests != nil {
+		err = interestRepo.LinkInterestsToUser(createdUser.Id, knownInterests)
+		if err != nil {
+			return createdUser, err
+		}
+	}
+
+	return createdUser, nil
+}
+
+//Функция для полного удаления пользователя. В первую очередь для тестов,
+//но возможно нужно будет использовать для исполнения закона о цифровом забвении № 149-ФЗ
+func (r *UserRepository) ForceUserDelete(userModel *model.UserModel) error {
+	interestRepo := GetInterestRepositoryDB(r.db)
+	err := interestRepo.UnlinkAllUserInterests(userModel.Id)
 	if err != nil {
 		return err
 	}
-
-
-	return nil
+	_, err = r.db.Exec("delete from social.user where id = ?", userModel.Id)
+	return err
 }
 
 func CreateUserModelMoc() *model.UserModel {
+	newId := rand.Int63n(2000000)
 	return &model.UserModel{
-		Id:         rand.Int63n(2000000),
+		Id:         newId,
 		PublicId:   uuid.Must(uuid.NewV4()).String(),
-		Email:      "sidorov@yandex.ru",
+		Email:      fmt.Sprintf("sidorov_%d@yandex.ru", newId),
 		FirstName:  "Валерий",
 		LastName:   "Сидоров",
 		MiddleName: "Владимирович",
 		Town:       "Сочи",
 		Gender:     2,
 		GenderDesc: "Мужской",
-		Interests:  []string{"Автомобили", "Рисование", "Программирование"},
-		CreatedAt:  time.Now().AddDate(0, -1, 0),
-		UpdatedAt:  time.Now().AddDate(0, 0, -11),
+		Interests:  []string{"Автомобили", "Рисование", "Программирование", "Вышивка"},
+		CreatedAt:  sql.NullTime{Time: time.Now().AddDate(0, -1, 0), Valid: true},
+		UpdatedAt:  sql.NullTime{Time: time.Now().AddDate(0, 0, -11), Valid: true},
 	}
 }

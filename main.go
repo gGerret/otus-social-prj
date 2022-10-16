@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/gGerret/otus-social-prj/repository"
 	"github.com/gGerret/otus-social-prj/router"
 	"github.com/gGerret/otus-social-prj/social"
 	"os"
@@ -53,6 +54,8 @@ func main() {
 	if err != nil {
 		mainLogger.DPanicf("Failed to initialize server with error: %s", err.Error())
 	}
+
+	repository.InitDb(cfg.Db)
 
 	err = socialWeb.RunServer()
 	if err != nil {

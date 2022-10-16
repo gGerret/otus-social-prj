@@ -1,11 +1,13 @@
 package model
 
-import "time"
+import (
+	"database/sql"
+)
 
 type InterestRawModel struct {
 	Id        int64
 	Interest  string
-	CreatedAt time.Time
+	CreatedAt sql.NullTime
 }
 
 type UserInterestLinkRawModel struct {

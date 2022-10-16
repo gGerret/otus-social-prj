@@ -12,7 +12,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gofrs/uuid"
 	"net/http"
-	"time"
 )
 
 type UserController struct {
@@ -63,15 +62,14 @@ func (c *UserController) RegisterUser(ctx *gin.Context) {
 	userModel := newUser.ToModel()
 	userModel.PasswordHash = utils.GeneratePassHash(newUser.Password)
 	userModel.PublicId = uuid.Must(uuid.NewV4()).String()
-	userModel.CreatedAt = time.Now()
 
-	err = rep.CreateByModel(userModel)
+	createdUser, err := rep.CreateByModel(userModel)
 	if err != nil {
 		ec.SetErr(entity.RegisterUserErr, err)
 		return
 	} else {
-		localLogger.Infof("User %s successfully registered", userModel.PublicId)
-		localLogger.Debug(userModel)
+		localLogger.Infof("User %d, %s successfully registered", createdUser.Id, createdUser.PublicId)
+		localLogger.Debug(createdUser)
 		ctx.Status(http.StatusOK)
 	}
 }
