@@ -6,7 +6,6 @@ import (
 	"github.com/gGerret/otus-social-prj/controller/entity"
 	"github.com/gGerret/otus-social-prj/social"
 	"github.com/gin-gonic/gin"
-	"github.com/gofrs/uuid"
 	"net/http"
 	"net/http/httputil"
 	"uyg-backend/models"
@@ -68,9 +67,9 @@ func (c *AuthController) PostUserPassMock(ctx *gin.Context) {
 	errHelper := NewErrHelper(ctx, localLogger)
 
 	userModel := &models.UserModel{}
-	publicId := uuid.Must(uuid.NewV4())
+	//publicId := uuid.Must(uuid.NewV4())
 
-	userModel.PublicId = publicId.String()
+	userModel.PublicId = "53722bba-4030-453f-8578-dc1d3941069c" //publicId.String()
 	token, err := c.guard.SetToken(userModel.PublicId, authTypeUser)
 
 	raw, _ := httputil.DumpRequest(ctx.Request, true)

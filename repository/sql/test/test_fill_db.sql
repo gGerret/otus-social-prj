@@ -44,4 +44,10 @@ insert into social.user_interests_link (user_id, interest_id, created_at) values
         (10,3,now()),
         (10,4,now())
 ;
-
+insert into social.user_friendship_link (user_id_a, user_id_b, comment, created_at) values
+(1, 8, 'Хочу дружить', now()),
+(1, 9, 'Давай дружить', now()),
+(3, 5, 'Привет тебе', now()),
+(3, 2, 'Привет!', now()),
+(3, 8, 'Здорово!', now()),
+(4, 5, 'Куку', now());

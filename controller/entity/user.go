@@ -67,6 +67,11 @@ type UserPasswordUpdateEntity struct {
 	RetypePassword string `json:"retype_pass"`
 }
 
+type NewFriendPublicIdEntity struct {
+	UserId  string `json:"user_id"`
+	Comment string `json:"comment"`
+}
+
 func (u *UserEntity) FromModel(userModel *model.UserModel) {
 	u.UserId = userModel.PublicId
 	u.Email = userModel.Email
@@ -82,6 +87,7 @@ func (u *UserEntity) FromModel(userModel *model.UserModel) {
 
 func (u *UserEntity) ToModel() *model.UserModel {
 	return &model.UserModel{
+		Id:         0,
 		PublicId:   u.UserId,
 		Email:      u.Email,
 		FirstName:  u.FirstName,
@@ -112,8 +118,22 @@ func (u *UserUpdateEntity) FromModel(userModel *model.UserModel) {
 	u.Interests = userModel.Interests
 }
 
+func (u *UserPublicEntity) ToModel() *model.UserModel {
+	return &model.UserModel{
+		Id:         0,
+		PublicId:   u.UserId,
+		FirstName:  u.FirstName,
+		LastName:   u.LastName,
+		MiddleName: u.MiddleName,
+		Town:       u.Town,
+		GenderDesc: u.Gender,
+		Interests:  u.Interests,
+	}
+}
+
 func (u *UserUpdateEntity) ToModel() *model.UserModel {
 	return &model.UserModel{
+		Id:         0,
 		FirstName:  u.FirstName,
 		LastName:   u.LastName,
 		MiddleName: u.MiddleName,
@@ -124,6 +144,7 @@ func (u *UserUpdateEntity) ToModel() *model.UserModel {
 }
 func (u *UserRegisterEntity) ToModel() *model.UserModel {
 	return &model.UserModel{
+		Id:         0,
 		Email:      u.Email,
 		FirstName:  u.FirstName,
 		LastName:   u.LastName,
@@ -131,5 +152,12 @@ func (u *UserRegisterEntity) ToModel() *model.UserModel {
 		Town:       u.Town,
 		GenderDesc: u.Gender,
 		Interests:  u.Interests,
+	}
+}
+
+func (u *NewFriendPublicIdEntity) ToModel() *model.UserModel {
+	return &model.UserModel{
+		Id:       0,
+		PublicId: u.UserId,
 	}
 }

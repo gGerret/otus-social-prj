@@ -137,14 +137,57 @@ func (c *UserController) PutUser(ctx *gin.Context) {
 
 }
 
-func (c *UserController) GetUserByFilter(context *gin.Context) {
+func (c *UserController) GetUserByFilter(ctx *gin.Context) {
 
 }
 
-func (c *UserController) GetUserFriends(context *gin.Context) {
+func (c *UserController) GetCurrentUserFriends(ctx *gin.Context) {
+	localLogger := c.logger.ContextLogger(ctx.GetString("reqId"), "GetCurrentUserFriends")
+	ec := NewErrHelper(ctx, localLogger)
+	rep := repository.GetUserRepository()
 
+	curUser, err := c.GetUserFromContext(ctx)
+	if err != nil {
+		ec.SetErr(entity.ErrUnauthorized, err)
+		return
+	}
+
+	friends, err := rep.GetUserFriends(curUser)
+	if err != nil {
+		ec.SetErr(entity.DataErrGetUserFriends, err)
+		return
+	}
+	ctx.JSON(http.StatusOK, friends)
 }
 
-func (c *UserController) MakeFriendship(context *gin.Context) {
+func (c *UserController) MakeFriendship(ctx *gin.Context) {
+	localLogger := c.logger.ContextLogger(ctx.GetString("reqId"), "MakeFriendship")
+	ec := NewErrHelper(ctx, localLogger)
+	rep := repository.GetUserRepository()
 
+	var friend entity.NewFriendPublicIdEntity
+	err := ctx.BindJSON(&friend)
+	if err != nil {
+		ec.SetErr(entity.ErrBadRequest, err)
+	} else {
+		v := validator.NewFriendValidator{Entity: &friend}
+		fe := v.Validate()
+		if len(fe) != 0 {
+			ec.SetErrEx(entity.DataErrBadUserInfo, fe)
+			return
+		}
+	}
+
+	curUser, err := c.GetUserFromContext(ctx)
+	if err != nil {
+		ec.SetErr(entity.ErrUnauthorized, err)
+		return
+	}
+	err = rep.CreateFriendshipLink(curUser, friend.ToModel(), friend.Comment)
+	if err != nil {
+		ec.SetErr(entity.DataErrFriendship, err)
+		return
+	}
+	localLogger.Debugf("friendship between %s and %s users created", curUser.PublicId, friend.UserId)
+	ctx.Status(http.StatusCreated)
 }
