@@ -67,6 +67,11 @@ type UserPasswordUpdateEntity struct {
 	RetypePassword string `json:"retype_pass"`
 }
 
+type UserBaseLoginEntity struct {
+	Email    string `json:"email"`
+	Password string `json:"passwd"`
+}
+
 type NewFriendPublicIdEntity struct {
 	UserId  string `json:"user_id"`
 	Comment string `json:"comment"`

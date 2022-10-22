@@ -226,6 +226,36 @@ func (r *UserRepository) ForceUserDelete(userModel *model.UserModel) error {
 	return nil
 }
 
+func (r *UserRepository) GetByEmail(email string) (user *model.UserModel, err error) {
+	row := r.db.QueryRow(
+		"select usr.id,\n"+
+			"       usr.public_id,\n"+
+			"       usr.pass_hash,\n"+
+			"       usr.email,\n"+
+			"       usr.first_name,\n"+
+			"       usr.last_name,\n"+
+			"       usr.middle_name,\n"+
+			"       usr.gender AS gender,\n"+
+			"       g.full_desc AS gender_desc,\n"+
+			"       usr.town,\n"+
+			"       usr.created_at,\n"+
+			"       usr.updated_at,\n"+
+			"       usr.deleted_at\n"+
+			"from social.user usr\n"+
+			"    join social.gender g ON g.id = usr.gender\n"+
+			"where usr.email = ?", &email)
+	userModel := model.UserModel{}
+	if err := row.Scan(&userModel.Id, &userModel.PublicId, &userModel.PasswordHash, &userModel.Email,
+		&userModel.FirstName, &userModel.LastName, &userModel.MiddleName, &userModel.Gender, &userModel.GenderDesc, &userModel.Town,
+		&userModel.CreatedAt, &userModel.UpdatedAt, &userModel.DeletedAt); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("UserRepository.GetByEmail %s : no such user", email)
+		}
+		return nil, fmt.Errorf("UserRepository.GetByEmail %s: %v", email, err)
+	}
+	return &userModel, nil
+}
+
 func CreateUserModelMoc() *model.UserModel {
 	newId := rand.Int63n(2000000)
 	return &model.UserModel{

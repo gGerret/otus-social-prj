@@ -24,6 +24,7 @@
         "port": 8080,
         "api": {
             "apiUrl": "/api",
+            "version": "/v1",
             "topPageSize": 100
         },
         "auth": {

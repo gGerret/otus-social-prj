@@ -64,7 +64,7 @@ func NewSocialServer(config *ServerConfig, logger *social.SocialLogger) (*Social
 
 	q.testCtrl = controller.NewTestController(q.cfg.Api, logger.Named("test-controller"))
 
-	apiRoute := q.router.Group(q.cfg.Api.ApiURL)
+	apiRoute := q.router.Group(q.cfg.Api.ApiURL + q.cfg.Api.Version)
 	{
 		//Всё про авторизацию. Выделяем в отдельную группу.
 		authRoute := apiRoute.Group(q.cfg.Auth.AuthUrl)

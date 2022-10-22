@@ -25,6 +25,9 @@ func NewUserController(config *ConfigApi, logger *social.SocialLogger) *UserCont
 	return c
 }
 
+// @BasePath /api/
+
+
 func (c *UserController) GetUserFromContext(ctx *gin.Context) (*model.UserModel, error) {
 	u, exists := ctx.Get("User")
 
@@ -41,6 +44,15 @@ func (c *UserController) GetUserFromContext(ctx *gin.Context) (*model.UserModel,
 
 }
 
+// PingExample godoc
+// @Summary RegisterUser
+// @Schemes
+// @Description Register new user
+// @Tags User
+// @Accept json
+// @Produce json
+// @Success 200
+// @Router /example/helloworld [get]
 func (c *UserController) RegisterUser(ctx *gin.Context) {
 	localLogger := c.logger.ContextLogger(ctx.GetString("reqId"), "RegisterUser")
 	ec := NewErrHelper(ctx, localLogger)
@@ -49,6 +61,7 @@ func (c *UserController) RegisterUser(ctx *gin.Context) {
 	err := ctx.BindJSON(&newUser)
 	if err != nil {
 		ec.SetErr(entity.ErrBadRequest, err)
+		return
 	} else {
 		v := validator.UserRegisterValidator{Entity: &newUser}
 		fe := v.Validate()
