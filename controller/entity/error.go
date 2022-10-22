@@ -27,10 +27,13 @@ var (
 	DataErrBadUserInfo    = ErrorEntityEx{http.StatusBadRequest, 40001, "Bad user info", "Incorrect user information was received", nil}
 	DataErrBadCountryCode = ErrorEntityEx{http.StatusBadRequest, 40002, "Bad country code", "Incorrect country code was received", nil}
 	DataErrUserExists     = ErrorEntity{http.StatusBadRequest, 40003, "User already exists", "User with same email already registered"}
+	DataErrFriendship     = ErrorEntity{http.StatusBadRequest, 40004, "Friendship is unavailable", "There is no possibility to create this friendship"}
+	DataErrGetUserFriends = ErrorEntity{http.StatusInternalServerError, 40005, "Can not get user friends", "An error occurred while trying to get user friends"}
 
 	//Database errors
-	UpdateUserErr = ErrorEntity{http.StatusInternalServerError, 50001, "DB error occurred", "An error occurred while trying to update user info"}
-	GetCountryErr = ErrorEntity{http.StatusInternalServerError, 50002, "DB error occurred", "An error occurred while trying to read country list"}
+	RegisterUserErr = ErrorEntity{http.StatusInternalServerError, 50001, "User register error", "User with this email already exists"}
+	UpdateUserErr   = ErrorEntity{http.StatusInternalServerError, 50002, "DB error occurred", "An error occurred while trying to update user info"}
+	GetCountryErr   = ErrorEntity{http.StatusInternalServerError, 50003, "DB error occurred", "An error occurred while trying to read country list"}
 )
 
 type ErrorEntity struct {

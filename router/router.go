@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"github.com/gGerret/otus-social-prj/controller"
 	"github.com/gGerret/otus-social-prj/controller/auth/jwt"
+	"github.com/gGerret/otus-social-prj/social"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 )
 
 type SocialServer struct {
 	router *gin.Engine
-	logger *zap.SugaredLogger
+	logger *social.SocialLogger
 	cfg    *ServerConfig
 
 	guard *jwt.Guard
@@ -21,10 +21,11 @@ type SocialServer struct {
 
 	//API Controllers
 	userCtrl *controller.UserController
+	dictCtrl *controller.DictionaryController
 	testCtrl *controller.TestController
 }
 
-func NewSocialServer(config *ServerConfig, logger *zap.SugaredLogger) (*SocialServer, error) {
+func NewSocialServer(config *ServerConfig, logger *social.SocialLogger) (*SocialServer, error) {
 
 	q := &SocialServer{
 		logger: logger,
@@ -37,17 +38,16 @@ func NewSocialServer(config *ServerConfig, logger *zap.SugaredLogger) (*SocialSe
 	q.guard = jwt.NewGuard(
 		q.cfg.Auth.Guard,
 		logger.Named("guard"),
-		q.cfg.Auth.AuthUrl+"/user/uri",
-		q.cfg.Auth.AuthUrl+"/uri",
-		q.cfg.Auth.AuthUrl+"/token",
-		q.cfg.Auth.AuthUrl+"/login",
-		q.cfg.Auth.AuthUrl+"/user/token",
-		q.cfg.Auth.AuthUrl+"/user/login",
-		q.cfg.Auth.AuthUrl+"/test_init",
+		//Эндпоинты, для которых не проверяется наличие токена аутентификации
+		q.cfg.Api.ApiURL+"/register",
+		q.cfg.Api.ApiURL+q.cfg.Auth.AuthUrl+"/login",
+		q.cfg.Api.ApiURL+q.cfg.Auth.AuthUrl+"/test_init", //TODO: Надо будет убрать для прода
 	)
+
+	q.router.Use(controller.BaseFilter)
 	q.router.Use(q.guard.AuthFilter)
 
-	//TODO: Перенести инициализацию в Guard
+	//Корсы...
 	q.router.Use(cors.New(cors.Config{
 		AllowOrigins: []string{"*"}, //TODO: ОБЯЗАТЕЛЬНО СДЕЛАТЬ, ЧТОБЫ В ПРОДЕ ПОДСТАВЛЯЛСЯ НОРМАЛЬНЫЙ ОРИДЖИН
 		AllowMethods: []string{"GET", "POST", "PUT", "OPTIONS"},
@@ -60,22 +60,35 @@ func NewSocialServer(config *ServerConfig, logger *zap.SugaredLogger) (*SocialSe
 
 	q.userCtrl = controller.NewUserController(q.cfg.Api, logger.Named("user-controller"))
 
+	q.dictCtrl = controller.NewDictionaryController(q.cfg.Api, logger.Named("dictionary-controller"))
+
 	q.testCtrl = controller.NewTestController(q.cfg.Api, logger.Named("test-controller"))
 
 	apiRoute := q.router.Group(q.cfg.Api.ApiURL)
 	{
+		//Всё про авторизацию. Выделяем в отдельную группу.
 		authRoute := apiRoute.Group(q.cfg.Auth.AuthUrl)
 		{
-			authRoute.POST("/uri", q.authCtrl.PostUri)
-			authRoute.POST("/token", q.authCtrl.PostUserToken)
-			authRoute.POST("/login", q.authCtrl.PostUserPassMock)
 
+			authRoute.POST("/login", q.authCtrl.PostUserPassMock)
 			authRoute.GET("/test_init", q.testCtrl.InitTestDB)
 		}
+		//Регистрация - отдельная вселенная
+		apiRoute.POST("/register", q.userCtrl.RegisterUser)
+
+		//Про пользователя
 		apiRoute.GET("/user", q.userCtrl.GetCurrentUser)
 		apiRoute.GET("/user/:id", q.userCtrl.GetUserById)
 		apiRoute.PUT("/user", q.userCtrl.PutUser)
+		apiRoute.POST("user/query", q.userCtrl.GetUserByFilter)
+		apiRoute.GET("/friendship", q.userCtrl.GetCurrentUserFriends)
+		apiRoute.POST("/friendship/:friend_id", q.userCtrl.MakeFriendship)
+
+		//Справочники
+		apiRoute.GET("/dict/interests", q.dictCtrl.GetKnownInterests)
+		apiRoute.GET("/dict/genders", q.dictCtrl.GetKnownGenders)
 	}
+
 	return q, nil
 }
 

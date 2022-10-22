@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/gGerret/otus-social-prj/repository"
 	"github.com/gGerret/otus-social-prj/router"
 	"go.uber.org/zap"
 	"io/ioutil"
@@ -10,7 +11,7 @@ import (
 type Config struct {
 	Logger *zap.Config          `json:"logger"`
 	Server *router.ServerConfig `json:"server"`
-	//Db     *repository.ConfigDb  `json:"db"`
+	Db     *repository.ConfigDb `json:"db"`
 }
 
 func NewConfig(file string) (*Config, error) {

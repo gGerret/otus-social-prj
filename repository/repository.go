@@ -26,7 +26,7 @@ func NewDB(db *sql.DB) *BaseRepository {
 
 func InitDb(cfg *ConfigDb) *sql.DB {
 	connectionString := fmt.Sprintf(
-		"username=%s:%s@%s(%s:%d)/%s",
+		"%s:%s@%s(%s:%d)/%s",
 		cfg.Username,
 		cfg.Password,
 		cfg.Net,

@@ -2,12 +2,11 @@ package entity
 
 import (
 	"github.com/gGerret/otus-social-prj/repository/model"
-	"github.com/gofrs/uuid"
 	"time"
 )
 
-type iUserEntity interface {
-	LoadFomModel(userModel *model.UserModel)
+type IUserEntity interface {
+	FomModel(userModel *model.UserModel)
 }
 
 type UserPost struct {
@@ -30,6 +29,7 @@ type UserPublicEntity struct {
 
 type UserEntity struct {
 	UserId     string    `json:"user_id"`
+	Email      string    `json:"email"`
 	FirstName  string    `json:"first_name"`
 	LastName   string    `json:"last_name"`
 	MiddleName string    `json:"middle_name"`
@@ -38,6 +38,18 @@ type UserEntity struct {
 	Town       string    `json:"town"`
 	CreatedAt  time.Time `json:"created"`
 	UpdatedAt  time.Time `json:"updated"`
+}
+
+type UserRegisterEntity struct {
+	Email          string   `json:"email"`
+	Password       string   `json:"passwd"`
+	RetypePassword string   `json:"retype_passwd"`
+	FirstName      string   `json:"first_name"`
+	LastName       string   `json:"last_name"`
+	MiddleName     string   `json:"middle_name"`
+	Gender         string   `json:"gender"`
+	Interests      []string `json:"interests"`
+	Town           string   `json:"town"`
 }
 
 type UserUpdateEntity struct {
@@ -55,39 +67,29 @@ type UserPasswordUpdateEntity struct {
 	RetypePassword string `json:"retype_pass"`
 }
 
-func (u *UserEntity) LoadFromModel(userModel *model.UserModel) {
+type NewFriendPublicIdEntity struct {
+	UserId  string `json:"user_id"`
+	Comment string `json:"comment"`
+}
+
+func (u *UserEntity) FromModel(userModel *model.UserModel) {
 	u.UserId = userModel.PublicId
+	u.Email = userModel.Email
 	u.FirstName = userModel.FirstName
 	u.LastName = userModel.LastName
 	u.MiddleName = userModel.MiddleName
 	u.Town = userModel.Town
 	u.Gender = userModel.GenderDesc
 	u.Interests = userModel.Interests
-	u.CreatedAt = userModel.CreatedAt
-	u.UpdatedAt = userModel.UpdatedAt
+	u.CreatedAt = userModel.CreatedAt.Time
+	u.UpdatedAt = userModel.UpdatedAt.Time
 }
 
-func (u *UserPublicEntity) LoadFromModel(userModel *model.UserModel) {
-	u.UserId = userModel.PublicId
-	u.FirstName = userModel.FirstName
-	u.LastName = userModel.LastName
-	u.MiddleName = userModel.MiddleName
-	u.Town = userModel.Town
-	u.Gender = userModel.GenderDesc
-	u.Interests = userModel.Interests
-}
-
-func (u *UserUpdateEntity) LoadFromModel(userModel *model.UserModel) {
-	u.FirstName = userModel.FirstName
-	u.LastName = userModel.LastName
-	u.MiddleName = userModel.MiddleName
-	u.Town = userModel.Town
-	u.Gender = userModel.GenderDesc
-	u.Interests = userModel.Interests
-}
-
-func (u *UserUpdateEntity) ToModel() *model.UserModel {
+func (u *UserEntity) ToModel() *model.UserModel {
 	return &model.UserModel{
+		Id:         0,
+		PublicId:   u.UserId,
+		Email:      u.Email,
 		FirstName:  u.FirstName,
 		LastName:   u.LastName,
 		MiddleName: u.MiddleName,
@@ -97,16 +99,65 @@ func (u *UserUpdateEntity) ToModel() *model.UserModel {
 	}
 }
 
-func CreateUserEntityMoc() *UserEntity {
-	return &UserEntity{
-		UserId:     uuid.Must(uuid.NewV4()).String(),
-		FirstName:  "Михаил",
-		LastName:   "Ушаков",
-		MiddleName: "Николаевич",
-		Town:       "Рязань",
-		Gender:     "мужской",
-		Interests:  []string{"Автомобили", "Рисование", "Программирование"},
-		CreatedAt:  time.Now().AddDate(0, -1, 0),
-		UpdatedAt:  time.Now().AddDate(0, 0, -11),
+func (u *UserPublicEntity) FromModel(userModel *model.UserModel) {
+	u.UserId = userModel.PublicId
+	u.FirstName = userModel.FirstName
+	u.LastName = userModel.LastName
+	u.MiddleName = userModel.MiddleName
+	u.Town = userModel.Town
+	u.Gender = userModel.GenderDesc
+	u.Interests = userModel.Interests
+}
+
+func (u *UserUpdateEntity) FromModel(userModel *model.UserModel) {
+	u.FirstName = userModel.FirstName
+	u.LastName = userModel.LastName
+	u.MiddleName = userModel.MiddleName
+	u.Town = userModel.Town
+	u.Gender = userModel.GenderDesc
+	u.Interests = userModel.Interests
+}
+
+func (u *UserPublicEntity) ToModel() *model.UserModel {
+	return &model.UserModel{
+		Id:         0,
+		PublicId:   u.UserId,
+		FirstName:  u.FirstName,
+		LastName:   u.LastName,
+		MiddleName: u.MiddleName,
+		Town:       u.Town,
+		GenderDesc: u.Gender,
+		Interests:  u.Interests,
+	}
+}
+
+func (u *UserUpdateEntity) ToModel() *model.UserModel {
+	return &model.UserModel{
+		Id:         0,
+		FirstName:  u.FirstName,
+		LastName:   u.LastName,
+		MiddleName: u.MiddleName,
+		Town:       u.Town,
+		GenderDesc: u.Gender,
+		Interests:  u.Interests,
+	}
+}
+func (u *UserRegisterEntity) ToModel() *model.UserModel {
+	return &model.UserModel{
+		Id:         0,
+		Email:      u.Email,
+		FirstName:  u.FirstName,
+		LastName:   u.LastName,
+		MiddleName: u.MiddleName,
+		Town:       u.Town,
+		GenderDesc: u.Gender,
+		Interests:  u.Interests,
+	}
+}
+
+func (u *NewFriendPublicIdEntity) ToModel() *model.UserModel {
+	return &model.UserModel{
+		Id:       0,
+		PublicId: u.UserId,
 	}
 }

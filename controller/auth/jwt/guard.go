@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gGerret/otus-social-prj/repository"
+	"github.com/gGerret/otus-social-prj/social"
 	"github.com/gin-gonic/gin"
 	"github.com/gofrs/uuid"
-	"go.uber.org/zap"
 	"net/http"
-	"strings"
 	"time"
 )
 
@@ -17,7 +16,7 @@ const DefaultHeader = "X-Auth-Token"
 
 type Guard struct {
 	cfg    *ConfigGuard
-	logger *zap.SugaredLogger
+	logger *social.SocialLogger
 	User   Authenticatable
 	exSet  map[string]struct{}
 }
@@ -27,7 +26,7 @@ type Authenticatable interface {
 	GetJwtClaims() *jwt.MapClaims
 }
 
-func NewGuard(cfg *ConfigGuard, logger *zap.SugaredLogger, exceptionList ...string) *Guard {
+func NewGuard(cfg *ConfigGuard, logger *social.SocialLogger, exceptionList ...string) *Guard {
 	guard := &Guard{
 		cfg:    cfg,
 		logger: logger,
@@ -38,6 +37,7 @@ func NewGuard(cfg *ConfigGuard, logger *zap.SugaredLogger, exceptionList ...stri
 		guard.exSet[s] = struct{}{}
 	}
 
+	logger.Debug(guard.exSet)
 	return guard
 }
 func (g *Guard) isException(uri string) bool {
@@ -45,6 +45,7 @@ func (g *Guard) isException(uri string) bool {
 	return ok
 }
 func (g *Guard) AuthFilter(ctx *gin.Context) {
+	localLogger := g.logger.ContextLogger(ctx.GetString("reqId"), "AuthFilter")
 	header := g.cfg.Header
 	if header == "" {
 		header = DefaultHeader
@@ -54,23 +55,22 @@ func (g *Guard) AuthFilter(ctx *gin.Context) {
 		ctx.Next()
 		return
 	}
-	rawToken := ctx.Request.Header.Get(header)
-	g.logger.Debug(ctx.Request.URL.Path)
+	xAuthToken := ctx.Request.Header.Get(header)
+	localLogger.Debug(ctx.Request.URL.Path)
 
 	if g.isException(ctx.Request.URL.Path) {
 		ctx.Next()
 		return
 	}
 
-	g.logger.Debugf("rawToken = %s", rawToken)
-	if rawToken == "" {
+	localLogger.Debugf("xAuthToken = %s", xAuthToken)
+	if xAuthToken == "" {
 		g.abort(ctx, errors.New("token is empty"))
 		return
 	}
 
-	xAuthToken := strings.Split(rawToken, " ")
-	g.logger.Debugf("xAuthToken[0] = %s, xAuthToken[1] = %s", xAuthToken[0], xAuthToken[1])
-	token, err := jwt.ParseWithClaims(xAuthToken[1], &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
+	localLogger.Debugf("xAuthToken = %s, xAuthToken[1] = %s", xAuthToken)
+	token, err := jwt.ParseWithClaims(xAuthToken, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
 		secret := g.cfg.Secret
 		if secret == "" {
 			panic("Secret for JWT auth is not defined!")
@@ -99,7 +99,7 @@ func (g *Guard) AuthFilter(ctx *gin.Context) {
 				return
 			}
 			rep := repository.GetUserRepository()
-			user, err := rep.GetByPublicIdUid(publicUid)
+			user, err := rep.GetByPublicId(publicUid.String())
 			if err != nil {
 				g.logger.Error("get user error ", err)
 				g.abort(ctx, err)
@@ -127,7 +127,7 @@ func (g *Guard) AuthFilter(ctx *gin.Context) {
 func (g *Guard) SetToken(publicId string, authType string) (string, error) {
 	// Create the Claims
 	claims := &jwt.StandardClaims{
-		Subject:   publicId + "/" + authType,
+		Subject:   publicId,
 		ExpiresAt: time.Now().UTC().Add(time.Duration(g.cfg.TokenLifeHours) * time.Hour).Unix(),
 		NotBefore: time.Now().UTC().Unix(),
 	}
