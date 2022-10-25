@@ -114,9 +114,9 @@ func (r *UserRepository) CreateByModel(userModel *model.UserModel) (createdUser 
 	}
 
 	result, err := r.db.Exec("insert into social.user (public_id, pass_hash, email, first_name, last_name, middle_name, gender, town, created_at) "+
-		"values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		"values (?, ?, ?, ?, ?, ?, ?, ?, now())",
 		usrRawModel.PublicId, usrRawModel.PasswordHash, usrRawModel.Email, usrRawModel.FirstName,
-		usrRawModel.LastName, usrRawModel.MiddleName, usrRawModel.Gender, usrRawModel.Town, usrRawModel.CreatedAt,
+		usrRawModel.LastName, usrRawModel.MiddleName, usrRawModel.Gender, usrRawModel.Town,
 	)
 	if err != nil {
 		return nil, err

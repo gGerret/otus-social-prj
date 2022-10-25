@@ -64,7 +64,7 @@ func isValidEmail(email string) bool {
 	return validEmail.MatchString(email)
 }
 func isValidPassword(password string) bool {
-	var validPassword = regexp.MustCompile(`(?=\d*)(?=[a-z]*)(?=[A-Z]*).{6,20}`)
+	var validPassword = regexp.MustCompile(`(\d*)([a-z]*)([A-Z]*).{6,20}`)
 	return validPassword.MatchString(password)
 }
 func isPasswordMatchRetype(password string, retype string) bool {
@@ -78,6 +78,6 @@ func isValidName(someName string) bool {
 	if len(someName) == 0 {
 		return true
 	}
-	var validName = regexp.MustCompile(`^[a-zA-Zа-яА-Я]$`)
+	var validName = regexp.MustCompile(`^[a-zA-Zа-яА-Я]+$`)
 	return validName.MatchString(someName)
 }

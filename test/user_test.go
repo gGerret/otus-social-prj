@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestGetUser(t *testing.T) {
+func TestCreateAndGetUser(t *testing.T) {
 	db := InitDbTest()
 	userRepo := repository.GetUserRepositoryDB(db)
 
@@ -31,6 +31,15 @@ func TestGetUser(t *testing.T) {
 		assert.NoError(t, err, "Can not get created user by PublicId")
 		assert.Equal(t, userByPublicId.Id, userById.Id, "Created user and received by PublicId user is not equals")
 	}
+}
+
+func TestGetTestUser(t *testing.T) {
+	db := InitDbTest()
+	userRepo := repository.GetUserRepositoryDB(db)
+
+	userByPublicId, err := userRepo.GetByPublicId("53722bba-4030-453f-8578-dc1d3941069c")
+	assert.NoError(t, err, "Can not get created user by PublicId")
+	assert.Equal(t, userByPublicId.Id, int64(3), "Created user and received by PublicId user is not equals")
 }
 
 func TestFriendship(t *testing.T) {

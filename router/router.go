@@ -34,14 +34,16 @@ func NewSocialServer(config *ServerConfig, logger *social.SocialLogger) (*Social
 	}
 	q.logger.Info("Initializing Social Web server...")
 
+	serverApiPath := q.cfg.Api.ApiURL + q.cfg.Api.Version
+
 	//Add auth filter
 	q.guard = jwt.NewGuard(
 		q.cfg.Auth.Guard,
 		logger.Named("guard"),
 		//Эндпоинты, для которых не проверяется наличие токена аутентификации
-		q.cfg.Api.ApiURL+"/register",
-		q.cfg.Api.ApiURL+q.cfg.Auth.AuthUrl+"/login",
-		q.cfg.Api.ApiURL+q.cfg.Auth.AuthUrl+"/test_init", //TODO: Надо будет убрать для прода
+		serverApiPath+"/register",
+		serverApiPath+q.cfg.Auth.AuthUrl+"/login",
+		serverApiPath+q.cfg.Auth.AuthUrl+"/test_init", //TODO: Надо будет убрать для прода
 	)
 
 	q.router.Use(controller.BaseFilter)
@@ -64,14 +66,20 @@ func NewSocialServer(config *ServerConfig, logger *social.SocialLogger) (*Social
 
 	q.testCtrl = controller.NewTestController(q.cfg.Api, logger.Named("test-controller"))
 
-	apiRoute := q.router.Group(q.cfg.Api.ApiURL + q.cfg.Api.Version)
+	apiRoute := q.router.Group(serverApiPath)
 	{
 		//Всё про авторизацию. Выделяем в отдельную группу.
 		authRoute := apiRoute.Group(q.cfg.Auth.AuthUrl)
 		{
 
-			authRoute.POST("/login", q.authCtrl.PostUserPassMock)
+			authRoute.POST("/login", q.authCtrl.PostUserPass)
 			authRoute.GET("/test_init", q.testCtrl.InitTestDB)
+		}
+		//Все справочники
+		dictionaryRoute := apiRoute.Group("/dict")
+		{
+			dictionaryRoute.GET("/gender/all", q.dictCtrl.GetKnownGenders)
+			dictionaryRoute.GET("/interest/all", q.dictCtrl.GetKnownInterests)
 		}
 		//Регистрация - отдельная вселенная
 		apiRoute.POST("/register", q.userCtrl.RegisterUser)
@@ -79,14 +87,11 @@ func NewSocialServer(config *ServerConfig, logger *social.SocialLogger) (*Social
 		//Про пользователя
 		apiRoute.GET("/user", q.userCtrl.GetCurrentUser)
 		apiRoute.GET("/user/:id", q.userCtrl.GetUserById)
-		apiRoute.PUT("/user", q.userCtrl.PutUser)
+		apiRoute.PUT("/user", q.userCtrl.UpdateCurrentUser)
 		apiRoute.POST("user/query", q.userCtrl.GetUserByFilter)
 		apiRoute.GET("/friendship", q.userCtrl.GetCurrentUserFriends)
 		apiRoute.POST("/friendship/:friend_id", q.userCtrl.MakeFriendship)
 
-		//Справочники
-		apiRoute.GET("/dict/interests", q.dictCtrl.GetKnownInterests)
-		apiRoute.GET("/dict/genders", q.dictCtrl.GetKnownGenders)
 	}
 
 	return q, nil

@@ -27,7 +27,6 @@ func NewUserController(config *ConfigApi, logger *social.SocialLogger) *UserCont
 
 // @BasePath /api/
 
-
 func (c *UserController) GetUserFromContext(ctx *gin.Context) (*model.UserModel, error) {
 	u, exists := ctx.Get("User")
 
@@ -118,8 +117,8 @@ func (c *UserController) GetUserById(ctx *gin.Context) {
 }
 
 //Update current user information
-func (c *UserController) PutUser(ctx *gin.Context) {
-	localLogger := c.logger.ContextLogger(ctx.GetString("reqId"), "PutUser")
+func (c *UserController) UpdateCurrentUser(ctx *gin.Context) {
+	localLogger := c.logger.ContextLogger(ctx.GetString("reqId"), "UpdateCurrentUser")
 	ec := NewErrHelper(ctx, localLogger)
 	rep := repository.GetUserRepository()
 

@@ -7,7 +7,7 @@ type GenderDictRawModel struct {
 	FullDesc  string
 }
 
-type UserGenderModel struct {
+type GenderModel struct {
 	Code      string
 	ShortDesc string
 	FullDesc  string

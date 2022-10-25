@@ -12,12 +12,12 @@ type InterestRepository struct {
 	BaseRepository
 }
 
-func GetInterestsRepository() *InterestRepository {
+func GetInterestRepository() *InterestRepository {
 
 	if database == nil {
 		panic("Error! Database connection is not initialized")
 	}
-	return GetInterestRepositoryDB(nil)
+	return GetInterestRepositoryDB(database)
 }
 
 func GetInterestRepositoryDB(db *sql.DB) *InterestRepository {
@@ -69,6 +69,25 @@ func (r *InterestRepository) GetByUserId(userId int64) (*model.UserInterestsMode
 		userInterests = append(userInterests, interest)
 	}
 	return &model.UserInterestsModel{UserId: userId, Interests: userInterests}, nil
+}
+
+//TODO: Сделать пагинацию
+func (r *InterestRepository) GetAll() ([]string, error) {
+	rows, err := r.db.Query("select i.interest from social.interests i order by i.id limit 1000")
+	if err != nil {
+		return nil, fmt.Errorf("InterestRepository.GetAll: %v", err)
+	}
+	defer rows.Close()
+	var userInterests []string
+
+	for rows.Next() {
+		var interest string
+		if err := rows.Scan(&interest); err != nil {
+			return nil, fmt.Errorf("InterestRepository.GetAll: %v", err)
+		}
+		userInterests = append(userInterests, interest)
+	}
+	return userInterests, nil
 }
 
 func (r *InterestRepository) GetInterestsFromList(interests []string) (known []model.InterestRawModel, unknown []model.InterestRawModel, err error) {

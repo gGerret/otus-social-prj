@@ -22,7 +22,8 @@ type UserPublicEntity struct {
 	FirstName  string   `json:"first_name"`
 	LastName   string   `json:"last_name"`
 	MiddleName string   `json:"middle_name"`
-	Gender     string   `json:"gender"`
+	Gender     int      `json:"gender"`
+	GenderDesc string   `json:"gender_desc"`
 	Interests  []string `json:"interests"`
 	Town       string   `json:"town"`
 }
@@ -33,7 +34,8 @@ type UserEntity struct {
 	FirstName  string    `json:"first_name"`
 	LastName   string    `json:"last_name"`
 	MiddleName string    `json:"middle_name"`
-	Gender     string    `json:"gender"`
+	Gender     int       `json:"gender"`
+	GenderDesc string    `json:"gender_desc"`
 	Interests  []string  `json:"interests"`
 	Town       string    `json:"town"`
 	CreatedAt  time.Time `json:"created"`
@@ -47,7 +49,7 @@ type UserRegisterEntity struct {
 	FirstName      string   `json:"first_name"`
 	LastName       string   `json:"last_name"`
 	MiddleName     string   `json:"middle_name"`
-	Gender         string   `json:"gender"`
+	Gender         int      `json:"gender"`
 	Interests      []string `json:"interests"`
 	Town           string   `json:"town"`
 }
@@ -56,7 +58,7 @@ type UserUpdateEntity struct {
 	FirstName  string   `json:"first_name"`
 	LastName   string   `json:"last_name"`
 	MiddleName string   `json:"middle_name"`
-	Gender     string   `json:"gender"`
+	Gender     int      `json:"gender"`
 	Interests  []string `json:"interests"`
 	Town       string   `json:"town"`
 }
@@ -84,7 +86,8 @@ func (u *UserEntity) FromModel(userModel *model.UserModel) {
 	u.LastName = userModel.LastName
 	u.MiddleName = userModel.MiddleName
 	u.Town = userModel.Town
-	u.Gender = userModel.GenderDesc
+	u.Gender = userModel.Gender
+	u.GenderDesc = userModel.GenderDesc
 	u.Interests = userModel.Interests
 	u.CreatedAt = userModel.CreatedAt.Time
 	u.UpdatedAt = userModel.UpdatedAt.Time
@@ -99,7 +102,8 @@ func (u *UserEntity) ToModel() *model.UserModel {
 		LastName:   u.LastName,
 		MiddleName: u.MiddleName,
 		Town:       u.Town,
-		GenderDesc: u.Gender,
+		Gender:     u.Gender,
+		GenderDesc: u.GenderDesc,
 		Interests:  u.Interests,
 	}
 }
@@ -110,7 +114,8 @@ func (u *UserPublicEntity) FromModel(userModel *model.UserModel) {
 	u.LastName = userModel.LastName
 	u.MiddleName = userModel.MiddleName
 	u.Town = userModel.Town
-	u.Gender = userModel.GenderDesc
+	u.Gender = userModel.Gender
+	u.GenderDesc = userModel.GenderDesc
 	u.Interests = userModel.Interests
 }
 
@@ -119,7 +124,7 @@ func (u *UserUpdateEntity) FromModel(userModel *model.UserModel) {
 	u.LastName = userModel.LastName
 	u.MiddleName = userModel.MiddleName
 	u.Town = userModel.Town
-	u.Gender = userModel.GenderDesc
+	u.Gender = userModel.Gender
 	u.Interests = userModel.Interests
 }
 
@@ -131,7 +136,8 @@ func (u *UserPublicEntity) ToModel() *model.UserModel {
 		LastName:   u.LastName,
 		MiddleName: u.MiddleName,
 		Town:       u.Town,
-		GenderDesc: u.Gender,
+		Gender:     u.Gender,
+		GenderDesc: u.GenderDesc,
 		Interests:  u.Interests,
 	}
 }
@@ -143,7 +149,7 @@ func (u *UserUpdateEntity) ToModel() *model.UserModel {
 		LastName:   u.LastName,
 		MiddleName: u.MiddleName,
 		Town:       u.Town,
-		GenderDesc: u.Gender,
+		Gender:     u.Gender,
 		Interests:  u.Interests,
 	}
 }
@@ -155,7 +161,7 @@ func (u *UserRegisterEntity) ToModel() *model.UserModel {
 		LastName:   u.LastName,
 		MiddleName: u.MiddleName,
 		Town:       u.Town,
-		GenderDesc: u.Gender,
+		Gender:     u.Gender,
 		Interests:  u.Interests,
 	}
 }
