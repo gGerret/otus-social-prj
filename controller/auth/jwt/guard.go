@@ -68,8 +68,6 @@ func (g *Guard) AuthFilter(ctx *gin.Context) {
 		g.abort(ctx, errors.New("token is empty"))
 		return
 	}
-
-	localLogger.Debugf("xAuthToken = %s, xAuthToken[1] = %s", xAuthToken)
 	token, err := jwt.ParseWithClaims(xAuthToken, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
 		secret := g.cfg.Secret
 		if secret == "" {

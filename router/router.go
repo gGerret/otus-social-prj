@@ -90,7 +90,7 @@ func NewSocialServer(config *ServerConfig, logger *social.SocialLogger) (*Social
 		apiRoute.PUT("/user", q.userCtrl.UpdateCurrentUser)
 		apiRoute.POST("user/query", q.userCtrl.GetUserByFilter)
 		apiRoute.GET("/friendship", q.userCtrl.GetCurrentUserFriends)
-		apiRoute.POST("/friendship/:friend_id", q.userCtrl.MakeFriendship)
+		apiRoute.PUT("/friendship", q.userCtrl.MakeFriendship)
 
 	}
 

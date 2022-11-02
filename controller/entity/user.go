@@ -28,6 +28,10 @@ type UserPublicEntity struct {
 	Town       string   `json:"town"`
 }
 
+type UserPublicEntityArray struct {
+	Users []UserPublicEntity `json:"users"`
+}
+
 type UserEntity struct {
 	UserId     string    `json:"user_id"`
 	Email      string    `json:"email"`
@@ -170,5 +174,12 @@ func (u *NewFriendPublicIdEntity) ToModel() *model.UserModel {
 	return &model.UserModel{
 		Id:       0,
 		PublicId: u.UserId,
+	}
+}
+func (g *UserPublicEntityArray) FromModelArray(ua []model.UserModel) {
+	for _, userModel := range ua {
+		userEntity := UserPublicEntity{}
+		userEntity.FromModel(&userModel)
+		g.Users = append(g.Users, userEntity)
 	}
 }

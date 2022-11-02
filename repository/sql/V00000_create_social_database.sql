@@ -1,4 +1,4 @@
-drop schema if exists social;
+-- drop schema if exists social;
 
 create schema if not exists social;
 

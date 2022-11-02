@@ -53,6 +53,12 @@ func GetRawUserModel(um *UserModel) *UserRawModel {
 	}
 }
 
+func (u *UserModel) AddInterests(interests []InterestRawModel) {
+	for _, i := range interests {
+		u.Interests = append(u.Interests, i.Interest)
+	}
+}
+
 func (u *UserRawModel) TableName() string {
 	return "user"
 }

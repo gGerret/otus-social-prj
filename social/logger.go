@@ -3,6 +3,8 @@ package social
 import (
 	"fmt"
 	"go.uber.org/zap"
+	"os"
+	"path/filepath"
 )
 
 type SocialLogger struct {
@@ -67,6 +69,8 @@ func (s *SocialLogger) Sync() error {
 }
 
 func InitLogger(cfg *zap.Config) *SocialLogger {
+	logsDir := filepath.Join(".", "logs")
+	err := os.MkdirAll(logsDir, os.ModePerm)
 	logger, err := cfg.Build()
 	if err != nil {
 		panic(fmt.Sprintf("Logger config is corrupted. Error: %s", err.Error()))

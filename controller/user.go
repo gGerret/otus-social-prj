@@ -109,14 +109,16 @@ func (c *UserController) GetUserById(ctx *gin.Context) {
 	user, err := rep.GetByPublicId(ctx.Param("id"))
 	if err != nil {
 		ec.SetErr(entity.ErrNotFound, err)
-	} else {
-		userEntity := &entity.UserPublicEntity{}
-		userEntity.FromModel(user)
-		ctx.JSON(http.StatusOK, userEntity)
+		return
 	}
+
+	userEntity := &entity.UserPublicEntity{}
+	userEntity.FromModel(user)
+	ctx.JSON(http.StatusOK, userEntity)
+
 }
 
-//Update current user information
+// Update current user information
 func (c *UserController) UpdateCurrentUser(ctx *gin.Context) {
 	localLogger := c.logger.ContextLogger(ctx.GetString("reqId"), "UpdateCurrentUser")
 	ec := NewErrHelper(ctx, localLogger)
@@ -169,7 +171,9 @@ func (c *UserController) GetCurrentUserFriends(ctx *gin.Context) {
 		ec.SetErr(entity.DataErrGetUserFriends, err)
 		return
 	}
-	ctx.JSON(http.StatusOK, friends)
+	friendsEntity := &entity.UserPublicEntityArray{}
+	friendsEntity.FromModelArray(friends)
+	ctx.JSON(http.StatusOK, friendsEntity)
 }
 
 func (c *UserController) MakeFriendship(ctx *gin.Context) {

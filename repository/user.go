@@ -55,8 +55,14 @@ func (r *UserRepository) GetById(userId int64) (*model.UserModel, error) {
 		if err == sql.ErrNoRows {
 			return nil, fmt.Errorf("UserRepository.GetById %d : no such user", userId)
 		}
-		return nil, fmt.Errorf("InterestRepository.GetById %d: %v", userId, err)
+		return nil, fmt.Errorf("UserRepository.GetById %d: %v", userId, err)
 	}
+	intRep := GetInterestRepository()
+	interests, err := intRep.GetByUserId(userModel.Id)
+	if err != nil {
+		return nil, fmt.Errorf("UserRepository.GetById %s: %v", userId, err)
+	}
+	userModel.Interests = interests.Interests
 	return &userModel, nil
 }
 
@@ -87,6 +93,13 @@ func (r *UserRepository) GetByPublicId(publicId string) (*model.UserModel, error
 		}
 		return nil, fmt.Errorf("UserRepository.GetByPublicId %s: %v", publicId, err)
 	}
+
+	intRep := GetInterestRepository()
+	interests, err := intRep.GetByUserId(userModel.Id)
+	if err != nil {
+		return nil, fmt.Errorf("UserRepository.GetByPublicId %s: %v", publicId, err)
+	}
+	userModel.Interests = interests.Interests
 	return &userModel, nil
 }
 
@@ -94,7 +107,7 @@ func (r *UserRepository) UpdateUser(userModel *model.UserModel) error {
 	return fmt.Errorf("UserRepository.UpdateUser %d, %s: method is not implemented yet", userModel.Id, userModel.PublicId)
 }
 
-//TODO: Добавить транзакцию для атомарного добавления пользователя
+// TODO: Добавить транзакцию для атомарного добавления пользователя
 func (r *UserRepository) CreateByModel(userModel *model.UserModel) (createdUser *model.UserModel, err error) {
 
 	usrRawModel := model.GetRawUserModel(userModel)
@@ -138,6 +151,7 @@ func (r *UserRepository) CreateByModel(userModel *model.UserModel) (createdUser 
 }
 
 func (r *UserRepository) GetUserFriends(userModel *model.UserModel) (friends []model.UserModel, err error) {
+	intRep := GetInterestRepository()
 	query :=
 		"select usr.id,\n" +
 			"       usr.public_id,\n" +
@@ -171,6 +185,12 @@ func (r *UserRepository) GetUserFriends(userModel *model.UserModel) (friends []m
 			&friend.CreatedAt, &friend.UpdatedAt, &friend.DeletedAt); err != nil {
 			return nil, fmt.Errorf("UserRepository.GetUserFriends %d: %v", userModel.Id, err)
 		}
+
+		interests, err := intRep.GetByUserId(friend.Id)
+		if err != nil {
+			return nil, fmt.Errorf("UserRepository.GetUserFriends %s: %v", userModel.Id, err)
+		}
+		friend.Interests = interests.Interests
 		friends = append(friends, friend)
 	}
 
@@ -207,8 +227,8 @@ func (r *UserRepository) CreateFriendshipLink(userA *model.UserModel, userB *mod
 	return nil
 }
 
-//Функция для полного удаления пользователя. В первую очередь для тестов,
-//но возможно нужно будет использовать для исполнения закона о цифровом забвении № 149-ФЗ
+// Функция для полного удаления пользователя. В первую очередь для тестов,
+// но возможно нужно будет использовать для исполнения закона о цифровом забвении № 149-ФЗ
 func (r *UserRepository) ForceUserDelete(userModel *model.UserModel) error {
 	interestRepo := GetInterestRepositoryDB(r.db)
 	err := interestRepo.UnlinkAllUserInterests(userModel.Id)
