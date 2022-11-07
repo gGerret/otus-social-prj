@@ -25,7 +25,8 @@
         "api": {
             "apiUrl": "/api",
             "version": "/v1",
-            "topPageSize": 100
+            "topPageSize": 100,
+            "adminToken": "Super secret admin token for debug and monitor needs"
         },
         "auth": {
             "authUrl": "/auth",

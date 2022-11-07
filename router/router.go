@@ -83,6 +83,7 @@ func NewSocialServer(config *ServerConfig, logger *social.SocialLogger) (*Social
 		}
 		//Регистрация - отдельная вселенная
 		apiRoute.POST("/register", q.userCtrl.RegisterUser)
+		apiRoute.DELETE("/registered", q.userCtrl.DeleteCurrentUser)
 
 		//Про пользователя
 		apiRoute.GET("/user", q.userCtrl.GetCurrentUser)

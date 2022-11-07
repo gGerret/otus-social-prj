@@ -207,3 +207,35 @@ func (c *UserController) MakeFriendship(ctx *gin.Context) {
 	localLogger.Debugf("friendship between %s and %s users created", curUser.PublicId, friend.UserId)
 	ctx.Status(http.StatusCreated)
 }
+
+// DeleteCurrentUser метод удаляет текущего пользователя. Для тесторования и отладки.
+// Требует админского токена. Без него не сработает.
+func (c *UserController) DeleteCurrentUser(ctx *gin.Context) {
+	localLogger := c.logger.ContextLogger(ctx.GetString("reqId"), "MakeFriendship")
+	ec := NewErrHelper(ctx, localLogger)
+	rep := repository.GetUserRepository()
+
+	adminToken := entity.AdminTokenEntity{}
+	err := ctx.BindJSON(&adminToken)
+	if err != nil {
+		ec.SetErr(entity.ErrNotFound)
+		return
+	}
+
+	if adminToken.AdminToken != c.cfg.AdminToken {
+		ec.SetErr(entity.ErrNotFound)
+		return
+	}
+
+	curUser, err := c.GetUserFromContext(ctx)
+	if err != nil {
+		ec.SetErr(entity.ErrUnauthorized, err)
+		return
+	}
+
+	rep.ForceUserDelete(curUser)
+	if err != nil {
+		ec.SetErr(entity.ErrInternal, err)
+		return
+	}
+}
