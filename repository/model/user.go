@@ -21,6 +21,15 @@ type UserModel struct {
 	DeletedAt    sql.NullTime
 }
 
+type UserFilterModel struct {
+	FirstName  *string
+	LastName   *string
+	MiddleName *string
+	Gender     *int
+	Interests  []string
+	Town       *string
+}
+
 type UserRawModel struct {
 	Id           int64
 	PublicId     string

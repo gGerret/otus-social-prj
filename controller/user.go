@@ -152,7 +152,25 @@ func (c *UserController) UpdateCurrentUser(ctx *gin.Context) {
 }
 
 func (c *UserController) GetUserByFilter(ctx *gin.Context) {
+	localLogger := c.logger.ContextLogger(ctx.GetString("reqId"), "GetUserByFilter")
+	ec := NewErrHelper(ctx, localLogger)
+	rep := repository.GetUserRepository()
 
+	var userFilter entity.UserFilterEntity
+	err := ctx.BindJSON(&userFilter)
+	if err != nil {
+		ec.SetErr(entity.ErrBadRequest, err)
+		return
+	}
+
+	users, err := rep.GetUsersByFilter(userFilter.ToModel())
+	if err != nil {
+		ec.SetErr(entity.DataErrQueryUsers, err)
+		return
+	}
+	usersEntity := &entity.UserPublicEntityArray{}
+	usersEntity.FromModelArray(users)
+	ctx.JSON(http.StatusOK, usersEntity)
 }
 
 func (c *UserController) GetCurrentUserFriends(ctx *gin.Context) {
@@ -208,6 +226,14 @@ func (c *UserController) MakeFriendship(ctx *gin.Context) {
 	ctx.Status(http.StatusCreated)
 }
 
+func (c *UserController) GetUserPage(context *gin.Context) {
+
+}
+
+func (c *UserController) UpdateCurrentUserPage(context *gin.Context) {
+
+}
+
 // DeleteCurrentUser метод удаляет текущего пользователя. Для тесторования и отладки.
 // Требует админского токена. Без него не сработает.
 func (c *UserController) DeleteCurrentUser(ctx *gin.Context) {
@@ -233,9 +259,15 @@ func (c *UserController) DeleteCurrentUser(ctx *gin.Context) {
 		return
 	}
 
-	rep.ForceUserDelete(curUser)
+	err = rep.ForceUserDelete(curUser)
 	if err != nil {
 		ec.SetErr(entity.ErrInternal, err)
 		return
 	}
+}
+
+func (c *UserController) GetCurrentUserPage(ctx *gin.Context) {
+	localLogger := c.logger.ContextLogger(ctx.GetString("reqId"), "GetCurrentUserPage")
+	ec := NewErrHelper(ctx, localLogger)
+	ec.SetErr(entity.ErrInternal)
 }

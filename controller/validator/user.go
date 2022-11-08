@@ -13,6 +13,7 @@ var (
 	MiddleNameFieldErr = FieldError{"middle_name", "First name is incorrect"}
 	PasswdFieldErr     = FieldError{"passwd", "Password must contains from 6 to 20 symbols. At leas one digit, one lowercase latin letter and one uppercase latin letter"}
 	PasswdNotMatch     = FieldError{"passwd", "Password and retype does not match"}
+	InterestInvalid    = FieldError{"interests", "Interest string is not valid"}
 )
 
 type UserRegisterValidator struct {
@@ -59,6 +60,31 @@ func (v *NewFriendValidator) Validate() []*FieldError {
 	return fieldErrs
 }
 
+type UserFilterValidator struct {
+	Entity *entity.UserFilterEntity
+}
+
+func (v *UserFilterValidator) Validate() []*FieldError {
+	var fieldErrs []*FieldError
+
+	if !isValidName(v.Entity.FirstName) {
+		fieldErrs = append(fieldErrs, &FirstNameFieldErr)
+	}
+	if !isValidName(v.Entity.LastName) {
+		fieldErrs = append(fieldErrs, &LastNameFieldErr)
+	}
+	if !isValidName(v.Entity.MiddleName) {
+		fieldErrs = append(fieldErrs, &MiddleNameFieldErr)
+	}
+	for _, interest := range v.Entity.Interests {
+		if !isValidInterest(interest) {
+			fieldErrs = append(fieldErrs, &InterestInvalid)
+			break
+		}
+	}
+	return fieldErrs
+}
+
 func isValidEmail(email string) bool {
 	var validEmail = regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,7}$`)
 	return validEmail.MatchString(email)
@@ -78,6 +104,13 @@ func isValidName(someName string) bool {
 	if len(someName) == 0 {
 		return true
 	}
-	var validName = regexp.MustCompile(`^[a-zA-Zа-яА-Я]+$`)
+	var validName = regexp.MustCompile(`^[a-zA-Zа-яА-Я'\s]+$`)
 	return validName.MatchString(someName)
+}
+func isValidInterest(someInterest string) bool {
+	if len(someInterest) == 0 {
+		return false
+	}
+	var validInterest = regexp.MustCompile(`^[a-zA-Zа-яА-Я0-9'_\-\s"]+$`)
+	return validInterest.MatchString(someInterest)
 }

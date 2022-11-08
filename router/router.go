@@ -86,12 +86,20 @@ func NewSocialServer(config *ServerConfig, logger *social.SocialLogger) (*Social
 		apiRoute.DELETE("/registered", q.userCtrl.DeleteCurrentUser)
 
 		//Про пользователя
-		apiRoute.GET("/user", q.userCtrl.GetCurrentUser)
-		apiRoute.GET("/user/:id", q.userCtrl.GetUserById)
-		apiRoute.PUT("/user", q.userCtrl.UpdateCurrentUser)
-		apiRoute.POST("user/query", q.userCtrl.GetUserByFilter)
-		apiRoute.GET("/friendship", q.userCtrl.GetCurrentUserFriends)
-		apiRoute.PUT("/friendship", q.userCtrl.MakeFriendship)
+		userRoute := apiRoute.Group("/user")
+		{
+			userRoute.GET("/", q.userCtrl.GetCurrentUser)
+			userRoute.GET("/page", q.userCtrl.GetCurrentUserPage)
+			userRoute.GET("/friendship", q.userCtrl.GetCurrentUserFriends)
+			userRoute.GET("/:id", q.userCtrl.GetUserById)
+			userRoute.GET("/:id/page", q.userCtrl.GetUserPage)
+
+			userRoute.PUT("/", q.userCtrl.UpdateCurrentUser)
+			userRoute.PUT("/page", q.userCtrl.UpdateCurrentUserPage)
+			userRoute.PUT("/friendship", q.userCtrl.MakeFriendship)
+
+			userRoute.POST("/query", q.userCtrl.GetUserByFilter)
+		}
 
 	}
 

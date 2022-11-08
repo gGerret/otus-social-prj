@@ -7,6 +7,7 @@ import (
 	"github.com/gGerret/otus-social-prj/repository/model"
 	"github.com/gofrs/uuid"
 	"math/rand"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -151,7 +152,7 @@ func (r *UserRepository) CreateByModel(userModel *model.UserModel) (createdUser 
 }
 
 func (r *UserRepository) GetUserFriends(userModel *model.UserModel) (friends []model.UserModel, err error) {
-	intRep := GetInterestRepository()
+	intRep := GetInterestRepositoryDB(r.db)
 	query :=
 		"select usr.id,\n" +
 			"       usr.public_id,\n" +
@@ -197,6 +198,86 @@ func (r *UserRepository) GetUserFriends(userModel *model.UserModel) (friends []m
 	return friends, nil
 }
 
+func (r *UserRepository) GetUsersByFilter(filterModel *model.UserFilterModel) (friends []model.UserModel, err error) {
+	intRep := GetInterestRepositoryDB(r.db)
+	query :=
+		"select usr.id,\n" +
+			"       usr.public_id,\n" +
+			"       usr.pass_hash,\n" +
+			"       usr.email,\n" +
+			"       usr.first_name,\n" +
+			"       usr.last_name,\n" +
+			"       usr.middle_name,\n" +
+			"       usr.gender AS gender,\n" +
+			"       g.full_desc AS gender_desc,\n" +
+			"       usr.town,\n" +
+			"       usr.created_at,\n" +
+			"       usr.updated_at,\n" +
+			"       usr.deleted_at\n" +
+			"from social.user usr\n" +
+			"    join social.gender g ON g.id = usr.gender\n"
+	if len(filterModel.Interests) > 0 {
+		query += "    join social.user_interests_link il ON il.user_id = usr.id\n" +
+			"    join social.interests itr ON il.interest_id = itr.id\n"
+	}
+
+	if clause := buildFilterClause(filterModel); len(clause) == 0 {
+		return nil, fmt.Errorf("UserRepository.GetUsersByFilter: Empty filter is not permited")
+	} else {
+		query += clause
+	}
+
+	rows, err := r.db.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("UserRepository.GetUsersByFilter: %v", err)
+	}
+	for rows.Next() {
+		var friend model.UserModel
+		if err := rows.Scan(&friend.Id, &friend.PublicId, &friend.PasswordHash, &friend.Email,
+			&friend.FirstName, &friend.LastName, &friend.MiddleName, &friend.Gender, &friend.GenderDesc, &friend.Town,
+			&friend.CreatedAt, &friend.UpdatedAt, &friend.DeletedAt); err != nil {
+			return nil, fmt.Errorf("UserRepository.GetUsersByFilter: %v", err)
+		}
+
+		interests, err := intRep.GetByUserId(friend.Id)
+		if err != nil {
+			return nil, fmt.Errorf("UserRepository.GetUsersByFilter: %v", err)
+		}
+		friend.Interests = interests.Interests
+		friends = append(friends, friend)
+	}
+
+	return friends, nil
+}
+
+func buildFilterClause(filterModel *model.UserFilterModel) string {
+	clause := "where 1 = 1\n"
+
+	if filterModel.FirstName != nil {
+		clause += "    and usr.first_name like '" + *filterModel.FirstName + "'\n"
+	}
+	if filterModel.LastName != nil {
+		clause += "    and usr.last_name like '" + *filterModel.LastName + "'\n"
+	}
+	if filterModel.MiddleName != nil {
+		clause += "    and usr.middle_name like '" + *filterModel.MiddleName + "'\n"
+	}
+	if filterModel.Town != nil {
+		clause += "    and usr.town like '" + *filterModel.Town + "'\n"
+	}
+	if filterModel.Gender != nil {
+		clause += "    and usr.gender = " + strconv.Itoa(*filterModel.Gender) + "\n"
+	}
+	if len(filterModel.Interests) > 0 {
+		clause += "    and itr.interest in ('" + filterModel.Interests[0] + "'"
+		for _, interest := range filterModel.Interests[1:] {
+			clause += ",'" + interest + "'"
+		}
+		clause += ")\n"
+	}
+	return clause
+}
+
 func (r *UserRepository) CreateFriendshipLink(userA *model.UserModel, userB *model.UserModel, comment string) (err error) {
 
 	if userA == nil || userA.Id == 0 {
@@ -227,7 +308,7 @@ func (r *UserRepository) CreateFriendshipLink(userA *model.UserModel, userB *mod
 	return nil
 }
 
-// Функция для полного удаления пользователя. В первую очередь для тестов,
+// ForceUserDelete Функция для полного удаления пользователя. В первую очередь для тестов,
 // но возможно нужно будет использовать для исполнения закона о цифровом забвении № 149-ФЗ
 func (r *UserRepository) ForceUserDelete(userModel *model.UserModel) error {
 	interestRepo := GetInterestRepositoryDB(r.db)

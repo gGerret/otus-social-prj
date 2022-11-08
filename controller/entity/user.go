@@ -67,6 +67,15 @@ type UserUpdateEntity struct {
 	Town       string   `json:"town"`
 }
 
+type UserFilterEntity struct {
+	FirstName  string   `json:"first_name"`
+	LastName   string   `json:"last_name"`
+	MiddleName string   `json:"middle_name"`
+	Gender     int      `json:"gender"`
+	Interests  []string `json:"interests"`
+	Town       string   `json:"town"`
+}
+
 type UserPasswordUpdateEntity struct {
 	OldPassword    string `json:"old_pass"`
 	NewPassword    string `json:"new_pass"`
@@ -182,4 +191,26 @@ func (g *UserPublicEntityArray) FromModelArray(ua []model.UserModel) {
 		userEntity.FromModel(&userModel)
 		g.Users = append(g.Users, userEntity)
 	}
+}
+
+func (f *UserFilterEntity) ToModel() *model.UserFilterModel {
+	m := &model.UserFilterModel{}
+	if len(f.FirstName) > 0 {
+		m.FirstName = &f.FirstName
+	}
+	if len(f.LastName) > 0 {
+		m.LastName = &f.LastName
+	}
+	if len(f.MiddleName) > 0 {
+		m.MiddleName = &f.MiddleName
+	}
+	if f.Gender != 0 {
+		m.Gender = &f.Gender
+	}
+	if len(f.Town) > 0 {
+		m.Town = &f.Town
+	}
+	m.Interests = f.Interests
+
+	return m
 }

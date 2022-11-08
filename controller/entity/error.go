@@ -29,6 +29,7 @@ var (
 	DataErrUserExists     = ErrorEntity{http.StatusBadRequest, 40003, "User already exists", "User with same email already registered"}
 	DataErrFriendship     = ErrorEntity{http.StatusBadRequest, 40004, "Friendship is unavailable", "There is no possibility to create this friendship"}
 	DataErrGetUserFriends = ErrorEntity{http.StatusInternalServerError, 40005, "Can not get user friends", "An error occurred while trying to get user friends"}
+	DataErrQueryUsers     = ErrorEntity{http.StatusInternalServerError, 40006, "Can not query users", "An error occurred while trying to query users by filter"}
 
 	//Database errors
 	RegisterUserErr = ErrorEntity{http.StatusInternalServerError, 50001, "User register error", "User with this email already exists"}

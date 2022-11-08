@@ -2,6 +2,7 @@ package test
 
 import (
 	"github.com/gGerret/otus-social-prj/repository"
+	"github.com/gGerret/otus-social-prj/repository/model"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -40,6 +41,18 @@ func TestGetTestUser(t *testing.T) {
 	userByPublicId, err := userRepo.GetByPublicId("53722bba-4030-453f-8578-dc1d3941069c")
 	assert.NoError(t, err, "Can not get created user by PublicId")
 	assert.Equal(t, userByPublicId.Id, int64(3), "Created user and received by PublicId user is not equals")
+}
+
+func TestQueryUser(t *testing.T) {
+	db := InitDbTest()
+	userRepo := repository.GetUserRepositoryDB(db)
+
+	userFilter := model.UserFilterModel{
+		Interests: []string{"Автомобили", "Сериалы"},
+	}
+	users, err := userRepo.GetUsersByFilter(&userFilter)
+	assert.NoError(t, err, "Can not get users by interests")
+	t.Log(users)
 }
 
 func TestFriendship(t *testing.T) {
