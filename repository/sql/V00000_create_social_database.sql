@@ -47,3 +47,32 @@ create table if not exists social.user_interests_link
 
     created_at timestamp not null comment 'время создания'
 ) comment 'Таблица связей пользователей и их интересов';
+
+drop table if exists social.user_friendship_link;
+
+create table if not exists social.user_friendship_link
+(
+    id bigint primary key auto_increment comment 'внутренний сквозной идентификатор',
+    user_id_a bigint not null comment 'идентификатор пользователя запросившего дружбу',
+    user_id_b bigint not null comment 'идентификатор пользователя получающего приглашение',
+
+    comment varchar(1024) comment 'комментарий к запросу на дружбу',
+    created_at timestamp not null comment 'время создания',
+    approved_at timestamp comment 'время подтверждения'
+);
+
+create unique index ufl_ua_ub on social.user_friendship_link (user_id_a, user_id_b);
+create unique index ufl_ub_ua on social.user_friendship_link (user_id_b, user_id_a);
+
+drop table if exists social.user_page;
+
+create table if not exists social.user_page (
+    id bigint primary key auto_increment comment 'внутренний сквозной идентификатор',
+    public_id varchar(64) unique not null comment 'публичный уникальный идентификатор',
+    user_id bigint not null comment 'Ссылка на social.user.id',
+    image_link text comment 'Ссылка на картинку пользователя',
+    page_text text comment 'Текст, написанный пользователем о себе',
+    created_at timestamp not null comment 'время создания записи',
+    updated_at timestamp comment 'время последнего обновления записи',
+    deleted_at timestamp comment 'время удаления записи, если установлено, считаем, что страница удалена'
+) comment 'Таблица для персональных страниц пользователей';
