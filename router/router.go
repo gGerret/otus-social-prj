@@ -111,7 +111,8 @@ func (q *SocialServer) GetBaseURI() string {
 }
 
 func (q *SocialServer) RunServer() error {
-	q.logger.Info("Starting server...")
+	q.logger.Info("Starting server in " + q.cfg.Mode + " mode...")
+	gin.SetMode(q.cfg.Mode)
 	defer func() {
 		q.logger.Info("Server shutdown")
 	}()
