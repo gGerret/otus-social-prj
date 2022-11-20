@@ -27,3 +27,5 @@
   go run main.go
   ```
 
+## Тестирование
+[Коллекция Postman](https://github.com/gGerret/otus-social-prj/blob/main/test/api/Gerret's%20Social%20Project%20(Otus%20HLA).postman_collection.json) для тестирования API 
