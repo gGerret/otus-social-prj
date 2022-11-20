@@ -77,12 +77,12 @@ func (c *UserController) RegisterUser(ctx *gin.Context) {
 
 	createdUser, err := rep.CreateByModel(userModel)
 	if err != nil {
-		ec.SetErr(entity.RegisterUserErr, err)
+		ec.SetErr(entity.DataErrUserExists, err)
 		return
 	} else {
 		localLogger.Infof("User %d, %s successfully registered", createdUser.Id, createdUser.PublicId)
 		localLogger.Debug(createdUser)
-		ctx.Status(http.StatusOK)
+		ctx.Status(http.StatusCreated)
 	}
 }
 
@@ -226,12 +226,16 @@ func (c *UserController) MakeFriendship(ctx *gin.Context) {
 	ctx.Status(http.StatusCreated)
 }
 
-func (c *UserController) GetUserPage(context *gin.Context) {
-
+func (c *UserController) GetUserPage(ctx *gin.Context) {
+	localLogger := c.logger.ContextLogger(ctx.GetString("reqId"), "MakeFriendship")
+	ec := NewErrHelper(ctx, localLogger)
+	ec.SetErr(entity.ErrNotImplemented)
 }
 
-func (c *UserController) UpdateCurrentUserPage(context *gin.Context) {
-
+func (c *UserController) UpdateCurrentUserPage(ctx *gin.Context) {
+	localLogger := c.logger.ContextLogger(ctx.GetString("reqId"), "MakeFriendship")
+	ec := NewErrHelper(ctx, localLogger)
+	ec.SetErr(entity.ErrNotImplemented)
 }
 
 // DeleteCurrentUser метод удаляет текущего пользователя. Для тесторования и отладки.
