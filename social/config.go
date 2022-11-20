@@ -1,4 +1,4 @@
-package main
+package social
 
 import (
 	"encoding/json"

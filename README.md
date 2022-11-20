@@ -4,7 +4,7 @@
 ## Запуск
 * Колнировать репозиторий
   ```
-  git clone https://github.com/gGerret/otus-social-prj && cd otus-social-prj
+  git clone https://github.com/gGerret/otus-social-prj && cd ./otus-social-prj
   cp ./bin/config.debug.json ./config.json
   ```
 * В файле `./config.json` изменить параметры подключения к БД

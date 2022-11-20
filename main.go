@@ -49,8 +49,9 @@ func main() {
 	if err != nil {
 		mainLogger.DPanicf("Failed to initialize server with error: %s", err.Error())
 	}
-
+	mainLogger.Info("Initialize database connection...")
 	repository.InitDb(cfg.Db)
+	mainLogger.Infof("Database '%s' initialized", repository.DbDriver)
 
 	err = socialWeb.RunServer()
 	if err != nil {
@@ -71,8 +72,8 @@ func initArguments() *Arguments {
 	return args
 }
 
-func initConfig(cfgPath string) *Config {
-	cfg, err := NewConfig(cfgPath)
+func initConfig(cfgPath string) *social.Config {
+	cfg, err := social.NewConfig(cfgPath)
 	if err != nil {
 		if _, ok := err.(*os.PathError); ok {
 			panic(fmt.Sprintf("ServerConfig not found at path: %s", cfgPath))
