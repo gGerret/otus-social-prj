@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/gGerret/otus-social-prj/config"
 	"github.com/gGerret/otus-social-prj/repository"
 	"github.com/gGerret/otus-social-prj/router"
 	"github.com/gGerret/otus-social-prj/social"
@@ -72,8 +73,8 @@ func initArguments() *Arguments {
 	return args
 }
 
-func initConfig(cfgPath string) *social.Config {
-	cfg, err := social.NewConfig(cfgPath)
+func initConfig(cfgPath string) *config.Config {
+	cfg, err := config.NewConfig(cfgPath)
 	if err != nil {
 		if _, ok := err.(*os.PathError); ok {
 			panic(fmt.Sprintf("ServerConfig not found at path: %s", cfgPath))

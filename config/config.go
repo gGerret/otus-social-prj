@@ -1,4 +1,4 @@
-package social
+package config
 
 import (
 	"encoding/json"
