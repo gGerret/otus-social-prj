@@ -1,0 +1,624 @@
+{
+	"info": {
+		"_postman_id": "28296604-de4c-443c-b2b9-19d6f79010e7",
+		"name": "Gerret's Social Project (Otus HLA)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "6489928"
+	},
+	"item": [
+		{
+			"name": "Dictionaries",
+			"item": [
+				{
+					"name": "Get known genders",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{session_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://{{social_base_url}}:{{social_base_port}}/api/v1/dict/gender/all",
+							"protocol": "http",
+							"host": [
+								"{{social_base_url}}"
+							],
+							"port": "{{social_base_port}}",
+							"path": [
+								"api",
+								"v1",
+								"dict",
+								"gender",
+								"all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get known interests",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{session_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://{{social_base_url}}:{{social_base_port}}/api/v1/dict/interest/all",
+							"protocol": "http",
+							"host": [
+								"{{social_base_url}}"
+							],
+							"port": "{{social_base_port}}",
+							"path": [
+								"api",
+								"v1",
+								"dict",
+								"interest",
+								"all"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Register User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"new_user@email.ru\",\r\n    \"passwd\": \"123123123\",\r\n    \"retype_passwd\": \"123123123\",\r\n    \"first_name\": \"Афанасий\",\r\n    \"last_name\": \"Никитин\",\r\n    \"middle_name\": \"Буги\",\r\n    \"gender\": 2,\r\n    \"interests\": [\"Автомобили\",\"Ужастики\",\"Море\"],\r\n    \"town\": \"Анапа\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{social_base_url}}:{{social_base_port}}/api/v1/register",
+					"protocol": "http",
+					"host": [
+						"{{social_base_url}}"
+					],
+					"port": "{{social_base_port}}",
+					"path": [
+						"api",
+						"v1",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);\r",
+							"if(jsonData != null){\r",
+							"    postman.setEnvironmentVariable(\"session_token\", jsonData.token);\r",
+							"    tests[\"Login \" + jsonData.user_id + \" sucessfull\"] = true\r",
+							"} else {\r",
+							"    tests[\"Response is empty\"] = false;\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"new_user@email.ru\",\r\n    \"passwd\": \"123123123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{social_base_url}}:{{social_base_port}}/api/v1/auth/login",
+					"protocol": "http",
+					"host": [
+						"{{social_base_url}}"
+					],
+					"port": "{{social_base_port}}",
+					"path": [
+						"api",
+						"v1",
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Success Login",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"email1@email.com\",\r\n    \"passwd\": \"123123123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{social_base_url}}:{{social_base_port}}/api/v1/auth/login",
+							"protocol": "http",
+							"host": [
+								"{{social_base_url}}"
+							],
+							"port": "{{social_base_port}}",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": "{\r\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2Njc0NzIzNTAsIm5iZiI6MTY2NzM4NTk1MCwic3ViIjoiYjY4MWQzOTEtMWIyZi00NGIzLWExYTAtZTQ5ZDYwOWIzNmU1In0.6S8otpY9CFu1GYjwhqPJD3y8649vIo36kEM41bXzk2k\",\r\n    \"user_id\": \"b681d391-1b2f-44b3-a1a0-e49d609b36e5\",\r\n    \"is_new_user\": false\r\n}"
+				}
+			]
+		},
+		{
+			"name": "Get current user info",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-Auth-Token",
+						"value": "{{session_token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{social_base_url}}:{{social_base_port}}/api/v1/user",
+					"protocol": "http",
+					"host": [
+						"{{social_base_url}}"
+					],
+					"port": "{{social_base_port}}",
+					"path": [
+						"api",
+						"v1",
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get user by Id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-Auth-Token",
+						"value": "{{session_token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{social_base_url}}:{{social_base_port}}/api/v1/user/35533584-e171-46f3-a51b-3484b8bc921e",
+					"protocol": "http",
+					"host": [
+						"{{social_base_url}}"
+					],
+					"port": "{{social_base_port}}",
+					"path": [
+						"api",
+						"v1",
+						"user",
+						"35533584-e171-46f3-a51b-3484b8bc921e"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Query users",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);\r",
+							"if(jsonData != null){\r",
+							"    postman.setEnvironmentVariable(\"future_friend\", jsonData.users[0].user_id);\r",
+							"    tests[\"Query returns \" + jsonData.users.length + \" users\"] = true\r",
+							"} else {\r",
+							"    tests[\"Response is empty\"] = false;\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-Auth-Token",
+						"value": "{{session_token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"filter\": {\r\n        \"interests\": [\"Автомобили\", \"Сериалы\"]\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{social_base_url}}:{{social_base_port}}/api/v1/user/query",
+					"protocol": "http",
+					"host": [
+						"{{social_base_url}}"
+					],
+					"port": "{{social_base_port}}",
+					"path": [
+						"api",
+						"v1",
+						"user",
+						"query"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Query users by interests",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "{{session_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"filter\": {\r\n        \"interests\": [\"Автомобили\", \"Сериалы\"]\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{social_base_url}}:{{social_base_port}}/api/v1/user/query",
+							"protocol": "http",
+							"host": [
+								"{{social_base_url}}"
+							],
+							"port": "{{social_base_port}}",
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"query"
+							]
+						}
+					},
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": "{\r\n    \"users\": [\r\n        {\r\n            \"user_id\": \"78758711-b581-46c7-8111-0abab5690d27\",\r\n            \"first_name\": \"Вася\",\r\n            \"last_name\": \"Васин\",\r\n            \"middle_name\": \"Романович\",\r\n            \"gender\": 2,\r\n            \"gender_desc\": \"мужской\",\r\n            \"interests\": [\r\n                \"Куклы\",\r\n                \"Сериалы\",\r\n                \"Музыка\"\r\n            ],\r\n            \"town\": \"Тула\"\r\n        },\r\n        {\r\n            \"user_id\": \"ab9e5ea9-e571-4ffa-ba5f-8530fc3916b6\",\r\n            \"first_name\": \"Петя\",\r\n            \"last_name\": \"Петин\",\r\n            \"middle_name\": \"Романович\",\r\n            \"gender\": 2,\r\n            \"gender_desc\": \"мужской\",\r\n            \"interests\": [\r\n                \"Автомобили\",\r\n                \"Музыка\"\r\n            ],\r\n            \"town\": \"Москва\"\r\n        },\r\n        {\r\n            \"user_id\": \"53722bba-4030-453f-8578-dc1d3941069c\",\r\n            \"first_name\": \"Маша\",\r\n            \"last_name\": \"Маишна\",\r\n            \"middle_name\": \"Романовна\",\r\n            \"gender\": 3,\r\n            \"gender_desc\": \"женский\",\r\n            \"interests\": [\r\n                \"Куклы\",\r\n                \"Музыка\",\r\n                \"Программирование\"\r\n            ],\r\n            \"town\": \"Брянск\"\r\n        },\r\n        {\r\n            \"user_id\": \"7fa0c8e5-483f-44f4-b6ed-84409f0a559d\",\r\n            \"first_name\": \"Ваня\",\r\n            \"last_name\": \"Васин\",\r\n            \"middle_name\": \"Романович\",\r\n            \"gender\": 2,\r\n            \"gender_desc\": \"мужской\",\r\n            \"interests\": [\r\n                \"Сериалы\",\r\n                \"Программирование\"\r\n            ],\r\n            \"town\": \"Сочи\"\r\n        },\r\n        {\r\n            \"user_id\": \"35533584-e171-46f3-a51b-3484b8bc921e\",\r\n            \"first_name\": \"Саша\",\r\n            \"last_name\": \"Сашина\",\r\n            \"middle_name\": \"Романовна\",\r\n            \"gender\": 3,\r\n            \"gender_desc\": \"женский\",\r\n            \"interests\": [\r\n                \"Кино\"\r\n            ],\r\n            \"town\": \"Орёл\"\r\n        },\r\n        {\r\n            \"user_id\": \"b5b3ac59-557d-41c1-af66-6233355b981f\",\r\n            \"first_name\": \"Коля\",\r\n            \"last_name\": \"Колин\",\r\n            \"middle_name\": \"Романович\",\r\n            \"gender\": 2,\r\n            \"gender_desc\": \"мужской\",\r\n            \"interests\": [\r\n                \"Автомобили\",\r\n                \"Куклы\",\r\n                \"Сериалы\",\r\n                \"Программирование\"\r\n            ],\r\n            \"town\": \"Дубна\"\r\n        },\r\n        {\r\n            \"user_id\": \"fc35215c-d03a-44dc-a90f-b67f78279f49\",\r\n            \"first_name\": \"Лена\",\r\n            \"last_name\": \"Ленина\",\r\n            \"middle_name\": \"Романовна\",\r\n            \"gender\": 3,\r\n            \"gender_desc\": \"женский\",\r\n            \"interests\": [\r\n                \"Автомобили\",\r\n                \"Музыка\"\r\n            ],\r\n            \"town\": \"Городец\"\r\n        },\r\n        {\r\n            \"user_id\": \"67d55b4d-cfa8-40e6-8c56-72355136e241\",\r\n            \"first_name\": \"Даша\",\r\n            \"last_name\": \"Дашина\",\r\n            \"middle_name\": \"Романовна\",\r\n            \"gender\": 3,\r\n            \"gender_desc\": \"женский\",\r\n            \"interests\": [\r\n                \"Программирование\"\r\n            ],\r\n            \"town\": \"Ульяновск\"\r\n        },\r\n        {\r\n            \"user_id\": \"8edb153c-f7ea-4680-9c67-7db14b310faf\",\r\n            \"first_name\": \"Катя\",\r\n            \"last_name\": \"Катина\",\r\n            \"middle_name\": \"Романовна\",\r\n            \"gender\": 3,\r\n            \"gender_desc\": \"женский\",\r\n            \"interests\": [\r\n                \"Сериалы\",\r\n                \"Кино\"\r\n            ],\r\n            \"town\": \"Владивосток\"\r\n        },\r\n        {\r\n            \"user_id\": \"f42da20f-016f-4d37-8058-db080a2a05cd\",\r\n            \"first_name\": \"Гоша\",\r\n            \"last_name\": \"Гошин\",\r\n            \"middle_name\": \"Романович\",\r\n            \"gender\": 2,\r\n            \"gender_desc\": \"мужской\",\r\n            \"interests\": [\r\n                \"Куклы\",\r\n                \"Сериалы\",\r\n                \"Кино\",\r\n                \"Программирование\"\r\n            ],\r\n            \"town\": \"Курган\"\r\n        },\r\n        {\r\n            \"user_id\": \"1a67b384-08c5-4bbc-adad-3d822e85eed9\",\r\n            \"first_name\": \"Афанасий\",\r\n            \"last_name\": \"Никитин\",\r\n            \"middle_name\": \"Буги\",\r\n            \"gender\": 2,\r\n            \"gender_desc\": \"мужской\",\r\n            \"interests\": [\r\n                \"Автомобили\",\r\n                \"Ужастики\",\r\n                \"Море\"\r\n            ],\r\n            \"town\": \"Анапа\"\r\n        }\r\n    ]\r\n}"
+				}
+			]
+		},
+		{
+			"name": "Make friendship",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "X-Auth-Token",
+						"value": "{{session_token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"user_id\": \"{{future_friend}}\",\r\n    \"comment\": \"Hello! Let me be your friend\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{social_base_url}}:{{social_base_port}}/api/v1/user/friendship",
+					"protocol": "http",
+					"host": [
+						"{{social_base_url}}"
+					],
+					"port": "{{social_base_port}}",
+					"path": [
+						"api",
+						"v1",
+						"user",
+						"friendship"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get current user friends",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-Auth-Token",
+						"value": "{{session_token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{social_base_url}}:{{social_base_port}}/api/v1/user/friendship",
+					"protocol": "http",
+					"host": [
+						"{{social_base_url}}"
+					],
+					"port": "{{social_base_port}}",
+					"path": [
+						"api",
+						"v1",
+						"user",
+						"friendship"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update user page",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "X-Auth-Token",
+						"value": "{{session_token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{social_base_url}}:{{social_base_port}}/api/v1/user/page",
+					"protocol": "http",
+					"host": [
+						"{{social_base_url}}"
+					],
+					"port": "{{social_base_port}}",
+					"path": [
+						"api",
+						"v1",
+						"user",
+						"page"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete current user (ADMIN)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "X-Auth-Token",
+						"value": "{{session_token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"admin_token\": \"Super secret admin token for debug and monitor needs\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{social_base_url}}:{{social_base_port}}/api/v1/registered",
+					"protocol": "http",
+					"host": [
+						"{{social_base_url}}"
+					],
+					"port": "{{social_base_port}}",
+					"path": [
+						"api",
+						"v1",
+						"registered"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "social_base_url",
+			"value": "localhost",
+			"type": "string"
+		},
+		{
+			"key": "social_base_port",
+			"value": "8080",
+			"type": "string"
+		}
+	]
+}
